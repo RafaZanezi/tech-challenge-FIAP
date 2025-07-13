@@ -1,29 +1,27 @@
-import { Status } from "../../enums/status.enum";
-import { Client } from "./Client";
+import { ServiceOrderStatus } from "../../enums/service-order-status.enum";
 import { Service } from "./Service";
 import { Supply } from "./Supply";
-import { Vehicle } from "./Vehicle";
 
 export class ServiceOrder {
-    client: Client;
-    vehicle: Vehicle;
+    clientId: number;
+    vehicleId: number;
     services: Service[];
     supplies: Supply[];
     createdAt: Date;
     finalizedAt: Date;
-    status: Status;
+    status: ServiceOrderStatus;
 
-    constructor(client: Client, vehicle: Vehicle, services: Service[]) {
-        this.client = client;
-        this.vehicle = vehicle;
+    constructor(clientId: number, vehicleId: number, services: Service[]) {
+        this.clientId = clientId;
+        this.vehicleId = vehicleId;
         this.services = services;
 
         this.createdAt = new Date();
-        this.status = Status.RECEIVED; // Default status
+        this.status = ServiceOrderStatus.RECEIVED; // Default status
     }
 
     startDiagnosis() {
-        this.status = Status.IN_DIAGNOSIS;
+        this.status = ServiceOrderStatus.IN_DIAGNOSIS;
     }
 
     updateServices(services: Service[]) {
@@ -35,27 +33,27 @@ export class ServiceOrder {
     }
 
     submitForApproval() {
-        this.status = Status.WAITING_FOR_APPROVAL;
+        this.status = ServiceOrderStatus.WAITING_FOR_APPROVAL;
     }
 
     approveOrder() {
-        this.status = Status.APPROVED;
+        this.status = ServiceOrderStatus.APPROVED;
     }
 
     startExecution() {
-        this.status = Status.IN_PROGRESS;
+        this.status = ServiceOrderStatus.IN_PROGRESS;
     }
 
     finalizeOrder() {
         this.finalizedAt = new Date();
-        this.status = Status.FINISHED;
+        this.status = ServiceOrderStatus.FINISHED;
     }
 
     deliverOrder() {
-        this.status = Status.DELIVERED;
+        this.status = ServiceOrderStatus.DELIVERED;
     }
 
     cancelOrder() {
-        this.status = Status.CANCELLED;
+        this.status = ServiceOrderStatus.CANCELLED;
     }
 }

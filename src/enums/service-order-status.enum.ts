@@ -1,4 +1,4 @@
-export enum Status {
+export enum ServiceOrderStatus {
     RECEIVED = "Recebida",
     IN_DIAGNOSIS = "Em Diagnóstico",
     WAITING_FOR_APPROVAL = "Aguardando Aprovação",

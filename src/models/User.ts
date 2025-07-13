@@ -1,6 +1,7 @@
-import { UserRole } from "../enums/user-roles.enum";
+import { UserRole } from "../enums/user-role.enum";
 
 export class User {
+    id: number;
     name: string;
     role: UserRole;
 }
