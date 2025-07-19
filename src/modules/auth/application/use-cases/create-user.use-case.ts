@@ -7,7 +7,7 @@ import { CreateUserRequest, CreateUserResponse } from '../create-user.dto';
 export class CreateUserUseCase implements UseCase<CreateUserRequest, CreateUserResponse> {
     constructor(private readonly userRepository: PostgresAuthRepository) { }
 
-    async execute(request: CreateUserRequest): Promise<CreateUserResponse> {
+    public async execute(request: CreateUserRequest): Promise<CreateUserResponse> {
         const { name, role, password } = request;
 
         if (!name || !role || !password) {

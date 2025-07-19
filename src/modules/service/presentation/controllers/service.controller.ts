@@ -1,19 +1,19 @@
-import { Service } from "../../../../shared/domain/entities/remover/Service";
+import { Service } from '../../../../shared/domain/entities/remover/Service';
 
 export default class ServiceController {
-    static async create(item: Service): Promise<Service> {
+    public static async create(item: Service): Promise<Service> {
         return Promise.resolve(item);
     }
 
-    static read(id: string): Promise<Service> {
-        throw new Error("Method not implemented.");
+    public static read(id: string): Promise<Service> {
+        throw new Error('Method not implemented.');
     }
 
-    static update(item: Service): Promise<Service> {
+    public static update(item: Service): Promise<Service> {
         return Promise.resolve(item);
     }
 
-    static delete(id: string): Promise<void> {
-        throw new Error("Method not implemented.");
+    public static delete(id: string): Promise<void> {
+        throw new Error('Method not implemented.');
     }
 }

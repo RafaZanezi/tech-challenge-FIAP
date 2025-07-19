@@ -17,9 +17,9 @@ const routes = (app) => {
         routerClients,
         routerVehicles,
         routerSupplies,
-        
-        routerServiceOrders,
+
+        routerServiceOrders
     );
-}
+};
 
 export default routes;

@@ -1,4 +1,4 @@
-import { BadRequestError, NotFoundHttpError, ConflictHttpError } from './http-errors';
+import { BadRequestError, ConflictHttpError, NotFoundHttpError } from './http-errors';
 
 export abstract class DomainError extends Error {
   constructor(message: string) {
@@ -8,7 +8,7 @@ export abstract class DomainError extends Error {
 }
 
 export class ValidationError extends DomainError {
-  toHttpError(): BadRequestError {
+  public toHttpError(): BadRequestError {
     return new BadRequestError(this.message);
   }
 }
@@ -18,13 +18,13 @@ export class NotFoundError extends DomainError {
     super(`${entity} with id ${id} not found`);
   }
 
-  toHttpError(): NotFoundHttpError {
+  public toHttpError(): NotFoundHttpError {
     return new NotFoundHttpError(this.message);
   }
 }
 
 export class ConflictError extends DomainError {
-  toHttpError(): ConflictHttpError {
+  public toHttpError(): ConflictHttpError {
     return new ConflictHttpError(this.message);
   }
 }

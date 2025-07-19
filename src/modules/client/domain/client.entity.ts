@@ -9,17 +9,6 @@ export interface ClientProps {
 }
 
 export class Client extends Entity<string> {
-  private readonly props: ClientProps;
-
-  constructor(props: ClientProps, id?: string) {
-    super(id);
-    this.validate(props);
-    this.props = {
-      ...props,
-      createdAt: props.createdAt ?? new Date(),
-      updatedAt: props.updatedAt ?? new Date(),
-    };
-  }
 
   get name(): string {
     return this.props.name;
@@ -36,6 +25,17 @@ export class Client extends Entity<string> {
   get updatedAt(): Date {
     return this.props.updatedAt;
   }
+  private readonly props: ClientProps;
+
+  constructor(props: ClientProps, id?: string) {
+    super(id);
+    this.validate(props);
+    this.props = {
+      ...props,
+      createdAt: props.createdAt ?? new Date(),
+      updatedAt: props.updatedAt ?? new Date()
+    };
+  }
 
   public updateName(name: string): void {
     if (!name || name.trim().length === 0) {
@@ -51,6 +51,16 @@ export class Client extends Entity<string> {
     }
     this.props.identifier = identifier;
     this.props.updatedAt = new Date();
+  }
+
+  public toJSON() {
+    return {
+      id: this._id,
+      name: this.props.name,
+      identifier: this.props.identifier,
+      createdAt: this.props.createdAt,
+      updatedAt: this.props.updatedAt
+    };
   }
 
   private validate(props: ClientProps): void {
@@ -71,15 +81,5 @@ export class Client extends Entity<string> {
     // Validação básica de CPF/CNPJ (pode ser expandida)
     const cleaned = identifier.replace(/\D/g, '');
     return cleaned.length === 11 || cleaned.length === 14;
-  }
-
-  public toJSON() {
-    return {
-      id: this._id,
-      name: this.props.name,
-      identifier: this.props.identifier,
-      createdAt: this.props.createdAt,
-      updatedAt: this.props.updatedAt,
-    };
   }
 }

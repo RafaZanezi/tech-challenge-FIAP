@@ -7,7 +7,7 @@ import { LoginUserRequest, LoginUserResponse } from '../login.dto';
 export class LoginUserUseCase implements UseCase<LoginUserRequest, LoginUserResponse> {
     constructor(private readonly userRepository: PostgresAuthRepository) { }
 
-    async execute(request: LoginUserRequest): Promise<LoginUserResponse> {
+    public async execute(request: LoginUserRequest): Promise<LoginUserResponse> {
         const { name, password } = request;
 
         if (!name || !password) {
@@ -22,7 +22,7 @@ export class LoginUserUseCase implements UseCase<LoginUserRequest, LoginUserResp
 
         return {
             ...user,
-            token,
+            token
         } as LoginUserResponse;
     }
 }

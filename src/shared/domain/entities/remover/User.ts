@@ -1,6 +1,6 @@
-import { UserRole } from "../../enums/user-role.enum";
+import { UserRole } from '../../enums/user-role.enum';
 
 export class UserEntity {
-    name: string;
-    role: UserRole;
+    public name: string;
+    public role: UserRole;
 }

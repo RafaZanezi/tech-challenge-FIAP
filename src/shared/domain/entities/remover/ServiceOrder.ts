@@ -1,15 +1,15 @@
-import { ServiceOrderStatus } from "../../enums/service-order-status.enum";
-import { Service } from "./Service";
-import { Supply } from "./Supply";
+import { ServiceOrderStatus } from '../../enums/service-order-status.enum';
+import { Service } from './Service';
+import { Supply } from './Supply';
 
 export class ServiceOrder {
-    clientId: number;
-    vehicleId: number;
-    services: Service[];
-    supplies: Supply[];
-    createdAt: Date;
-    finalizedAt: Date;
-    status: ServiceOrderStatus;
+    public clientId: number;
+    public vehicleId: number;
+    public services: Service[];
+    public supplies: Supply[];
+    public createdAt: Date;
+    public finalizedAt: Date;
+    public status: ServiceOrderStatus;
 
     constructor(clientId: number, vehicleId: number, services: Service[]) {
         this.clientId = clientId;
@@ -20,40 +20,40 @@ export class ServiceOrder {
         this.status = ServiceOrderStatus.RECEIVED; // Default status
     }
 
-    startDiagnosis() {
+    public startDiagnosis() {
         this.status = ServiceOrderStatus.IN_DIAGNOSIS;
     }
 
-    updateServices(services: Service[]) {
+    public updateServices(services: Service[]) {
         this.services = services;
     }
 
-    updateSupplies(supplies: Supply[]) {
+    public updateSupplies(supplies: Supply[]) {
         this.supplies = supplies;
     }
 
-    submitForApproval() {
+    public submitForApproval() {
         this.status = ServiceOrderStatus.WAITING_FOR_APPROVAL;
     }
 
-    approveOrder() {
+    public approveOrder() {
         this.status = ServiceOrderStatus.APPROVED;
     }
 
-    startExecution() {
+    public startExecution() {
         this.status = ServiceOrderStatus.IN_PROGRESS;
     }
 
-    finalizeOrder() {
+    public finalizeOrder() {
         this.finalizedAt = new Date();
         this.status = ServiceOrderStatus.FINISHED;
     }
 
-    deliverOrder() {
+    public deliverOrder() {
         this.status = ServiceOrderStatus.DELIVERED;
     }
 
-    cancelOrder() {
+    public cancelOrder() {
         this.status = ServiceOrderStatus.CANCELLED;
     }
 }

@@ -12,17 +12,6 @@ export interface VehicleProps {
 }
 
 export class Vehicle extends Entity<string> {
-  private readonly props: VehicleProps;
-
-  constructor(props: VehicleProps, id?: string) {
-    super(id);
-    this.validate(props);
-    this.props = {
-      ...props,
-      createdAt: props.createdAt ?? new Date(),
-      updatedAt: props.updatedAt ?? new Date(),
-    };
-  }
 
   get brand(): string {
     return this.props.brand;
@@ -51,6 +40,30 @@ export class Vehicle extends Entity<string> {
   get updatedAt(): Date {
     return this.props.updatedAt;
   }
+  private readonly props: VehicleProps;
+
+  constructor(props: VehicleProps, id?: string) {
+    super(id);
+    this.validate(props);
+    this.props = {
+      ...props,
+      createdAt: props.createdAt ?? new Date(),
+      updatedAt: props.updatedAt ?? new Date()
+    };
+  }
+
+  public toJSON() {
+    return {
+      id: this._id,
+      brand: this.props.brand,
+      model: this.props.model,
+      year: this.props.year,
+      licensePlate: this.props.licensePlate,
+      clientId: this.props.clientId,
+      createdAt: this.props.createdAt,
+      updatedAt: this.props.updatedAt
+    };
+  }
 
   private validate(props: VehicleProps): void {
     if (!props.brand || props.brand.trim().length === 0) {
@@ -72,18 +85,5 @@ export class Vehicle extends Entity<string> {
     if (!props.clientId || props.clientId.trim().length === 0) {
       throw new ValidationError('Client ID is required');
     }
-  }
-
-  public toJSON() {
-    return {
-      id: this._id,
-      brand: this.props.brand,
-      model: this.props.model,
-      year: this.props.year,
-      licensePlate: this.props.licensePlate,
-      clientId: this.props.clientId,
-      createdAt: this.props.createdAt,
-      updatedAt: this.props.updatedAt,
-    };
   }
 }

@@ -1,44 +1,44 @@
-import { ServiceOrder } from "../../../../shared/domain/entities/remover/ServiceOrder";
+import { ServiceOrder } from '../../../../shared/domain/entities/remover/ServiceOrder';
 
 export default class ServiceOrderController {
 
-    static async create(item: ServiceOrder): Promise<ServiceOrder> {
+    public static async create(item: ServiceOrder): Promise<ServiceOrder> {
         return Promise.resolve(item);
     }
 
-    static read(id: string): Promise<ServiceOrder> {
-        throw new Error("Method not implemented.");
+    public static read(id: string): Promise<ServiceOrder> {
+        throw new Error('Method not implemented.');
     }
 
-    static startDiagnosis(id: string): Promise<ServiceOrder> {
-        throw new Error("Method not implemented.");
+    public static startDiagnosis(id: string): Promise<ServiceOrder> {
+        throw new Error('Method not implemented.');
     }
 
-    static update(item: ServiceOrder): Promise<ServiceOrder> {
+    public static update(item: ServiceOrder): Promise<ServiceOrder> {
         return Promise.resolve(item);
     }
 
-    static submitForApproval(id: string): Promise<ServiceOrder> {
-        throw new Error("Method not implemented.");
+    public static submitForApproval(id: string): Promise<ServiceOrder> {
+        throw new Error('Method not implemented.');
     }
 
-    static approve(id: string): Promise<ServiceOrder> {
-        throw new Error("Method not implemented.");
+    public static approve(id: string): Promise<ServiceOrder> {
+        throw new Error('Method not implemented.');
     }
 
-    static startExecution(id: string): Promise<ServiceOrder> {
-        throw new Error("Method not implemented.");
+    public static startExecution(id: string): Promise<ServiceOrder> {
+        throw new Error('Method not implemented.');
     }
 
-    static finalize(id: string): Promise<ServiceOrder> {
-        throw new Error("Method not implemented.");
+    public static finalize(id: string): Promise<ServiceOrder> {
+        throw new Error('Method not implemented.');
     }
 
-    static deliver(id: string): Promise<ServiceOrder> {
-        throw new Error("Method not implemented.");
+    public static deliver(id: string): Promise<ServiceOrder> {
+        throw new Error('Method not implemented.');
     }
 
-    static cancel(id: string): Promise<ServiceOrder> {
-        throw new Error("Method not implemented.");
+    public static cancel(id: string): Promise<ServiceOrder> {
+        throw new Error('Method not implemented.');
     }
 }

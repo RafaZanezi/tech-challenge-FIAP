@@ -1,5 +1,5 @@
 export class Service {
-    name: string;
-    description: string;
-    price: number;
+    public name: string;
+    public description: string;
+    public price: number;
 }

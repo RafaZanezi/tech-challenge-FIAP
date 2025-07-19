@@ -1,5 +1,5 @@
-import { Pool } from 'pg';
 import dotenv from 'dotenv';
+import { Pool } from 'pg';
 
 dotenv.config();
 
@@ -12,5 +12,5 @@ pool.on('connect', () => {
 });
 
 export default {
-    query: (text, params) => pool.query(text, params),
+    query: (text, params) => pool.query(text, params)
 };

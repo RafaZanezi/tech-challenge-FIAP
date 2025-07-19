@@ -1,9 +1,9 @@
-import { Client, ClientProps } from '../../domain/client.entity';
-import { ClientRepository } from '../../domain/client-repository.interface';
 import connection from '../../../../shared/infrastructure/database/connection';
+import { ClientRepository } from '../../domain/client-repository.interface';
+import { Client, ClientProps } from '../../domain/client.entity';
 
 export class PostgresClientRepository implements ClientRepository {
-  async findById(id: string): Promise<Client | null> {
+  public async findById(id: string): Promise<Client | null> {
     const result = await connection.query(
       'SELECT * FROM clients WHERE id = $1',
       [id]
@@ -16,12 +16,12 @@ export class PostgresClientRepository implements ClientRepository {
     return this.mapToEntity(result.rows[0]);
   }
 
-  async findAll(): Promise<Client[]> {
+  public async findAll(): Promise<Client[]> {
     const result = await connection.query('SELECT * FROM clients ORDER BY created_at DESC');
-    return result.rows.map(row => this.mapToEntity(row));
+    return result.rows.map((row) => this.mapToEntity(row));
   }
 
-  async findByIdentifier(identifier: string): Promise<Client | null> {
+  public async findByIdentifier(identifier: string): Promise<Client | null> {
     const result = await connection.query(
       'SELECT * FROM clients WHERE identifier = $1',
       [identifier]
@@ -34,7 +34,7 @@ export class PostgresClientRepository implements ClientRepository {
     return this.mapToEntity(result.rows[0]);
   }
 
-  async save(entity: Client): Promise<Client> {
+  public async save(entity: Client): Promise<Client> {
     const result = await connection.query(
       'INSERT INTO clients (id, name, identifier, created_at, updated_at) VALUES ($1, $2, $3, $4, $5) RETURNING *',
       [entity.id, entity.name, entity.identifier, entity.createdAt, entity.updatedAt]
@@ -43,7 +43,7 @@ export class PostgresClientRepository implements ClientRepository {
     return this.mapToEntity(result.rows[0]);
   }
 
-  async update(id: string, entity: Partial<Client>): Promise<Client> {
+  public async update(id: string, entity: Partial<Client>): Promise<Client> {
     const setClause = [];
     const values = [];
     let paramCount = 1;
@@ -71,7 +71,7 @@ export class PostgresClientRepository implements ClientRepository {
     return this.mapToEntity(result.rows[0]);
   }
 
-  async delete(id: string): Promise<void> {
+  public async delete(id: string): Promise<void> {
     await connection.query('DELETE FROM clients WHERE id = $1', [id]);
   }
 
@@ -80,7 +80,7 @@ export class PostgresClientRepository implements ClientRepository {
       name: row.name,
       identifier: row.identifier,
       createdAt: row.created_at,
-      updatedAt: row.updated_at,
+      updatedAt: row.updated_at
     };
 
     return new Client(props, row.id);

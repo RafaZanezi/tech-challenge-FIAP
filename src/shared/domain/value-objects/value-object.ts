@@ -5,7 +5,7 @@ export abstract class ValueObject<T> {
     this.props = Object.freeze(props);
   }
 
-  equals(vo?: ValueObject<T>): boolean {
+  public equals(vo?: ValueObject<T>): boolean {
     if (vo === null || vo === undefined) {
       return false;
     }

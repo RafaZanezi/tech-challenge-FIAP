@@ -11,12 +11,12 @@ export abstract class HttpError extends Error {
     Error.captureStackTrace(this, this.constructor);
   }
 
-  toJSON() {
+  public toJSON() {
     return {
       name: this.name,
       message: this.message,
       statusCode: this.statusCode,
-      timestamp: new Date().toISOString(),
+      timestamp: new Date().toISOString()
     };
   }
 }

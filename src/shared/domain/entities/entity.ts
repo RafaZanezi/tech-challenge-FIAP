@@ -9,7 +9,7 @@ export abstract class Entity<T = any> {
     return this._id;
   }
 
-  equals(entity: Entity<T>): boolean {
+  public equals(entity: Entity<T>): boolean {
     if (entity === null || entity === undefined) {
       return false;
     }

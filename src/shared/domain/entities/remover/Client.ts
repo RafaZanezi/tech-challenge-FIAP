@@ -1,8 +1,8 @@
 export class Client {
-    name: string;
-    identifier: string;
+    public name: string;
+    public identifier: string;
 
-    isValidIdentifier(): boolean {
+    public isValidIdentifier(): boolean {
         // Implementar lógica de validação do identificador
         return true; // Exemplo simplificado
     }

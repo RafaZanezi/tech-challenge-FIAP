@@ -6,7 +6,8 @@
   "scripts": {
     "compile": "tsc && node dist/server.js",
     "start": "./node_modules/nodemon/bin/nodemon.js -e ts  --exec \"npm run compile\"",
-    "lint": "eslint . --ext .ts",
+    "lint": "tslint -p tsconfig.json",
+    "lint:fix": "tslint -p tsconfig.json --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -19,6 +20,7 @@
     "eslint": "^9.31.0",
     "globals": "^16.3.0",
     "nodemon": "^3.1.10",
+    "tslint": "^5.20.1",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.36.0"

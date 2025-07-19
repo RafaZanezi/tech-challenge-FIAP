@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import { ConflictError, NotFoundError, ValidationError } from '../../../shared/domain/errors/domain-errors';
 import { HttpError } from '../../../shared/domain/errors/http-error';
-import { ValidationError, NotFoundError, ConflictError } from '../../../shared/domain/errors/domain-errors';
 import { InternalServerError } from '../../../shared/domain/errors/http-errors';
 
 export interface ErrorResponse {
@@ -15,13 +15,13 @@ export interface ErrorResponse {
 }
 
 export class ErrorHandler {
-  static handle(error: Error, req: Request, res: Response, next: NextFunction): void {
+  public static handle(error: Error, req: Request, res: Response, next: NextFunction): void {
     console.error('Error caught by handler:', {
       name: error.name,
       message: error.message,
       stack: error.stack,
       url: req.url,
-      method: req.method,
+      method: req.method
     });
 
     // Se já é um HttpError, use diretamente
@@ -61,8 +61,8 @@ export class ErrorHandler {
         message: error.message,
         statusCode: error.statusCode,
         timestamp: new Date().toISOString(),
-        path,
-      },
+        path
+      }
     };
 
     res.status(error.statusCode).json(errorResponse);
