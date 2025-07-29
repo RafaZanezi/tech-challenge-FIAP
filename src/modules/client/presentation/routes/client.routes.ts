@@ -1,14 +1,14 @@
 import express from 'express';
-import ClientController from '../controllers/client.controller';
+import { makeClientController } from '../../../../main/factories/client-controller.factory';
 
 const routerClients = express.Router();
 
-// routerClients.get('/clientes', ClientController.read);
-// routerClients.get('/clientes/:id', ClientController.read);
+const clientController = makeClientController();
 
-// routerClients.post('/clientes', ClientController.create);
-// routerClients.put('/clientes/:id', ClientController.update);
-
-// routerClients.delete('/clientes/:id', ClientController.delete);
+routerClients.get('/clients', clientController.find);
+routerClients.get('/clients/:id', clientController.find);
+routerClients.post('/clients', clientController.create);
+routerClients.put('/clients/:id', clientController.update);
+routerClients.delete('/clients/:id', clientController.delete);
 
 export default routerClients;

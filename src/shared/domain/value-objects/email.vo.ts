@@ -17,7 +17,7 @@ export class Email extends ValueObject<EmailProps> {
   }
   constructor(email: string) {
     if (!Email.isValid(email)) {
-      throw new ValidationError('Invalid email format');
+      throw new ValidationError('Formato de email inválido');
     }
 
     super({ value: email });

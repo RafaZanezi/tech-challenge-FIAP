@@ -3,7 +3,7 @@ import { ClientRepository } from '../../domain/client-repository.interface';
 import { Client, ClientProps } from '../../domain/client.entity';
 
 export class PostgresClientRepository implements ClientRepository {
-  public async findById(id: string): Promise<Client | null> {
+  public async findById(id: number): Promise<Client | null> {
     const result = await connection.query(
       'SELECT * FROM clients WHERE id = $1',
       [id]
@@ -17,7 +17,7 @@ export class PostgresClientRepository implements ClientRepository {
   }
 
   public async findAll(): Promise<Client[]> {
-    const result = await connection.query('SELECT * FROM clients ORDER BY created_at DESC');
+    const result = await connection.query('SELECT * FROM clients ORDER BY id DESC');
     return result.rows.map((row) => this.mapToEntity(row));
   }
 
@@ -36,14 +36,14 @@ export class PostgresClientRepository implements ClientRepository {
 
   public async save(entity: Client): Promise<Client> {
     const result = await connection.query(
-      'INSERT INTO clients (id, name, identifier, created_at, updated_at) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [entity.id, entity.name, entity.identifier, entity.createdAt, entity.updatedAt]
+      'INSERT INTO clients (name, identifier) VALUES ($1, $2) RETURNING *',
+      [entity.name, entity.identifier]
     );
 
     return this.mapToEntity(result.rows[0]);
   }
 
-  public async update(id: string, entity: Partial<Client>): Promise<Client> {
+  public async update(id: number, entity: Partial<Client>): Promise<Client> {
     const setClause = [];
     const values = [];
     let paramCount = 1;
@@ -58,9 +58,6 @@ export class PostgresClientRepository implements ClientRepository {
       values.push(entity.identifier);
     }
 
-    setClause.push(`updated_at = $${paramCount++}`);
-    values.push(new Date());
-
     values.push(id);
 
     const result = await connection.query(
@@ -71,16 +68,14 @@ export class PostgresClientRepository implements ClientRepository {
     return this.mapToEntity(result.rows[0]);
   }
 
-  public async delete(id: string): Promise<void> {
+  public async delete(id: number): Promise<void> {
     await connection.query('DELETE FROM clients WHERE id = $1', [id]);
   }
 
   private mapToEntity(row: any): Client {
     const props: ClientProps = {
       name: row.name,
-      identifier: row.identifier,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at
+      identifier: row.identifier
     };
 
     return new Client(props, row.id);

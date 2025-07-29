@@ -39,11 +39,11 @@ export class User extends Entity<number> {
 
     private validate(props: UserProps): void {
         if (!props.name || props.name.trim().length === 0) {
-            throw new ValidationError('User name is required');
+            throw new ValidationError('Nome do usuário é obrigatório');
         }
 
         if (!Object.values(UserRole).includes(props.role)) {
-            throw new ValidationError('Invalid user role');
+            throw new ValidationError('Função do usuário inválida');
         }
     }
 }

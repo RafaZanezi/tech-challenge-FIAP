@@ -9,7 +9,7 @@ export class PostgresAuthRepository implements AuthRepository {
         const verifyDuplicate = await database.query('SELECT * FROM users WHERE name = $1', [name]);
 
         if (verifyDuplicate.rows.length > 0) {
-            throw new BadRequestError('User already exists');
+            throw new BadRequestError('Usuário já existe');
         }
 
         const result = await database.query(
@@ -30,7 +30,7 @@ export class PostgresAuthRepository implements AuthRepository {
         const result = await database.query('SELECT * FROM users WHERE name = $1', [name]);
 
         if (result.rows.length === 0) {
-            throw new BadRequestError('User not found');
+            throw new BadRequestError('Usuário não encontrado');
         }
 
         const user = result.rows[0];
@@ -38,7 +38,7 @@ export class PostgresAuthRepository implements AuthRepository {
         const passwordMatched = await bcrypt.compare(password, user.password);
 
         if (!passwordMatched) {
-            throw new BadRequestError('Invalid credentials');
+            throw new BadRequestError('Credenciais inválidas');
         }
 
         const dbUser = {

@@ -8,29 +8,23 @@ export class CreateClientUseCase implements UseCase<CreateClientRequest, CreateC
   constructor(private readonly clientRepository: ClientRepository) {}
 
   public async execute(request: CreateClientRequest): Promise<CreateClientResponse> {
-    // Verificar se já existe um cliente com esse identificador
     const existingClient = await this.clientRepository.findByIdentifier(request.identifier);
 
     if (existingClient) {
-      throw new ConflictError('Client with this identifier already exists');
+      throw new ConflictError('Cliente com este identificador já existe');
     }
 
-    // Criar nova instância do cliente
     const client = new Client({
       name: request.name,
-      identifier: request.identifier,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      identifier: request.identifier
     });
 
-    // Salvar no repositório
     const savedClient = await this.clientRepository.save(client);
 
     return {
       id: savedClient.id,
       name: savedClient.name,
-      identifier: savedClient.identifier,
-      createdAt: savedClient.createdAt
+      identifier: savedClient.identifier
     };
   }
 }

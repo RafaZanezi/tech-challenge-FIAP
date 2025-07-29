@@ -16,7 +16,7 @@ export interface ErrorResponse {
 
 export class ErrorHandler {
   public static handle(error: Error, req: Request, res: Response, next: NextFunction): void {
-    console.error('Error caught by handler:', {
+    console.error('Erro capturado pelo handler:', {
       name: error.name,
       message: error.message,
       stack: error.stack,

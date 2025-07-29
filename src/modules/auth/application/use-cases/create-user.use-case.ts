@@ -11,7 +11,7 @@ export class CreateUserUseCase implements UseCase<CreateUserRequest, CreateUserR
         const { name, role, password } = request;
 
         if (!name || !role || !password) {
-            throw new BadRequestError('Name, role, and password are required');
+            throw new BadRequestError('Nome, função e senha são obrigatórios');
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -25,8 +25,8 @@ export class CreateUserUseCase implements UseCase<CreateUserRequest, CreateUserR
                 role: user.role || role
             };
         } catch (error) {
-            console.error('Error creating user:', error);
-            throw new ConflictHttpError('Failed to create user');
+            console.error('Erro ao criar usuário:', error);
+            throw new ConflictHttpError('Falha ao criar usuário');
         }
     }
 }

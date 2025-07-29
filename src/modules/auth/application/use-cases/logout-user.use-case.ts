@@ -9,6 +9,6 @@ export class LogoutUserUseCase implements UseCase<null, string> {
         blacklist[token] = true;
         setTimeout(() => delete blacklist[token], parseInt(process.env.JWT_EXPIRES) * 1000);
 
-        return 'Logout succeeded';
+        return 'Logout realizado com sucesso';
     }
 }

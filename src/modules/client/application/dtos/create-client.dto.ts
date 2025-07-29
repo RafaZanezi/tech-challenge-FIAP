@@ -4,8 +4,7 @@ export interface CreateClientRequest {
 }
 
 export interface CreateClientResponse {
-  id: string;
+  id: number;
   name: string;
   identifier: string;
-  createdAt: Date;
 }

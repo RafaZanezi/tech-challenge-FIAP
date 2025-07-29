@@ -24,7 +24,7 @@ export class AsyncResult {
       // Se não for HttpError, cria um erro genérico
       const httpError = new (class extends HttpError {
         constructor() {
-          super(error instanceof Error ? error.message : 'Unknown error', 500);
+          super(error instanceof Error ? error.message : 'Erro desconhecido', 500);
         }
       })();
 
@@ -70,7 +70,7 @@ export function handleAsync<T extends any[], R>(
       // Se não for HttpError, cria um erro genérico
       const httpError = new (class extends HttpError {
         constructor() {
-          super(error instanceof Error ? error.message : 'Unknown error', 500);
+          super(error instanceof Error ? error.message : 'Erro desconhecido', 500);
         }
       })();
 

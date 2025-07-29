@@ -6,7 +6,7 @@ export default class ServiceController {
     }
 
     public static read(id: string): Promise<Service> {
-        throw new Error('Method not implemented.');
+        throw new Error('Método não implementado.');
     }
 
     public static update(item: Service): Promise<Service> {
@@ -14,6 +14,6 @@ export default class ServiceController {
     }
 
     public static delete(id: string): Promise<void> {
-        throw new Error('Method not implemented.');
+        throw new Error('Método não implementado.');
     }
 }

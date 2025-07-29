@@ -6,6 +6,7 @@ import AuthController from '../../modules/auth/presentation/controllers/auth.con
 
 export function makeAuthController(): AuthController {
   const userRepository = new PostgresAuthRepository();
+  
   const createUserUseCase = new CreateUserUseCase(userRepository);
   const loginUserUseCase = new LoginUserUseCase(userRepository);
   const logoutUseCase = new LogoutUserUseCase();

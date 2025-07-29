@@ -18,8 +18,8 @@ export function adaptRoute(controller: Controller) {
 
       res.status(httpResponse.statusCode).json(httpResponse.body);
     } catch (error) {
-      console.error('Route adapter error:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      console.error('Erro no adaptador de rota:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
     }
   };
 }

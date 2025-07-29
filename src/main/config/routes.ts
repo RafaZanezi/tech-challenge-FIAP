@@ -10,16 +10,12 @@ const routes = (app) => {
         res.status(200).send({ title: 'Bem vindo ao Sistema Integrado de Atendimento e Execução de Serviços' });
     });
 
-    app.use(
-        express.json(),
-        routerAuth,
-
-        routerClients,
-        routerVehicles,
-        routerSupplies,
-
-        routerServiceOrders
-    );
+    app.use(express.json());
+    app.use('/auth', routerAuth);
+    app.use('/api', routerClients);
+    app.use('/api', routerVehicles);
+    app.use('/api', routerSupplies);
+    app.use('/api', routerServiceOrders);
 };
 
 export default routes;

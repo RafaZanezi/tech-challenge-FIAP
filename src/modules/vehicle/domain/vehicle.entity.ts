@@ -67,23 +67,23 @@ export class Vehicle extends Entity<string> {
 
   private validate(props: VehicleProps): void {
     if (!props.brand || props.brand.trim().length === 0) {
-      throw new ValidationError('Vehicle brand is required');
+      throw new ValidationError('Marca do veículo é obrigatória');
     }
 
     if (!props.model || props.model.trim().length === 0) {
-      throw new ValidationError('Vehicle model is required');
+      throw new ValidationError('Modelo do veículo é obrigatório');
     }
 
     if (!props.year || props.year < 1900 || props.year > new Date().getFullYear() + 1) {
-      throw new ValidationError('Invalid vehicle year');
+      throw new ValidationError('Ano do veículo inválido');
     }
 
     if (!props.licensePlate || props.licensePlate.trim().length === 0) {
-      throw new ValidationError('License plate is required');
+      throw new ValidationError('Placa do veículo é obrigatória');
     }
 
     if (!props.clientId || props.clientId.trim().length === 0) {
-      throw new ValidationError('Client ID is required');
+      throw new ValidationError('ID do cliente é obrigatório');
     }
   }
 }
