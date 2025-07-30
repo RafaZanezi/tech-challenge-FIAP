@@ -13,7 +13,7 @@ export class UpdateClientUseCase implements UseCase<UpdateClientRequest, UpdateC
         try {
             const existingClient = await this.clientRepository.findByIdentifier(request.identifier);
 
-            if (existingClient) {
+            if (existingClient && existingClient.id !== id) {
                 throw new ConflictError('Cliente com este identificador já existe');
             }
 

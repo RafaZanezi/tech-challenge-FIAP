@@ -6,12 +6,10 @@ export interface VehicleProps {
   model: string;
   year: number;
   licensePlate: string;
-  clientId: string;
-  createdAt: Date;
-  updatedAt: Date;
+  clientId: number;
 }
 
-export class Vehicle extends Entity<string> {
+export class Vehicle extends Entity<number> {
 
   get brand(): string {
     return this.props.brand;
@@ -29,27 +27,16 @@ export class Vehicle extends Entity<string> {
     return this.props.licensePlate;
   }
 
-  get clientId(): string {
+  get clientId(): number {
     return this.props.clientId;
   }
 
-  get createdAt(): Date {
-    return this.props.createdAt;
-  }
-
-  get updatedAt(): Date {
-    return this.props.updatedAt;
-  }
   private readonly props: VehicleProps;
 
-  constructor(props: VehicleProps, id?: string) {
+  constructor(props: VehicleProps, id?: number) {
     super(id);
     this.validate(props);
-    this.props = {
-      ...props,
-      createdAt: props.createdAt ?? new Date(),
-      updatedAt: props.updatedAt ?? new Date()
-    };
+    this.props = props;
   }
 
   public toJSON() {
@@ -59,9 +46,6 @@ export class Vehicle extends Entity<string> {
       model: this.props.model,
       year: this.props.year,
       licensePlate: this.props.licensePlate,
-      clientId: this.props.clientId,
-      createdAt: this.props.createdAt,
-      updatedAt: this.props.updatedAt
     };
   }
 
@@ -82,8 +66,16 @@ export class Vehicle extends Entity<string> {
       throw new ValidationError('Placa do veículo é obrigatória');
     }
 
-    if (!props.clientId || props.clientId.trim().length === 0) {
+    if (!this.validateLicensePlate(props.licensePlate)) {
+      throw new ValidationError('Placa do veículo inválida');
+    }
+
+    if (!props.clientId || props.clientId <= 0) {
       throw new ValidationError('ID do cliente é obrigatório');
     }
+  }
+
+  private validateLicensePlate(plate: string): boolean {
+    return RegExp(/^[A-Z]{3}[- ]?[0-9]{4}$/).test(plate);// Format ABC-1234
   }
 }

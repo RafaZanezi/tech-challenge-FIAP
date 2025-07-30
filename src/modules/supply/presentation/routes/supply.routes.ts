@@ -1,13 +1,14 @@
 import express from 'express';
+import { makeSupplyController } from '../../../../main/factories/supply-controller.factory';
 
 const routerSupplies = express.Router();
 
-// routerSupplies.get('/supplies', SupplyController.read);
-// routerSupplies.get('/supplies/:id', SupplyController.read);
+const supplyController = makeSupplyController();
 
-// routerSupplies.post('/supplies', SupplyController.create);
-// routerSupplies.put('/supplies/:id', SupplyController.update);
-
-// routerSupplies.delete('/supplies/:id', SupplyController.delete);
+routerSupplies.get('/supplies', supplyController.find);
+routerSupplies.get('/supplies/:id', supplyController.find);
+routerSupplies.post('/supplies', supplyController.create);
+routerSupplies.put('/supplies/:id', supplyController.update);
+routerSupplies.delete('/supplies/:id', supplyController.delete);
 
 export default routerSupplies;

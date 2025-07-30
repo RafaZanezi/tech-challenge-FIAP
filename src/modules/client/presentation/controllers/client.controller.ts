@@ -31,8 +31,8 @@ export default class ClientController {
 
     public update = async (req, res) => {
         try {
-            const response = await this.updateClientUseCase.execute(req.body);
-            
+            const response = await this.updateClientUseCase.execute({ ...req.body, id: parseInt(req.params.id) });
+
             res.status(200).json({
                 success: true,
                 data: response
@@ -73,7 +73,7 @@ export default class ClientController {
     public delete = async (req, res) => {
         try {
             const clientId = req.params.id;
-            await this.deleteClientUseCase.execute(clientId);
+            await this.deleteClientUseCase.execute({ id: parseInt(clientId) });
             
             res.status(200).json({
                 success: true,
