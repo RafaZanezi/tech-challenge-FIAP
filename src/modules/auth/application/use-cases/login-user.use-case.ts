@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { UseCase } from '../../../../shared/application/interfaces/use-case.interface';
 import { BadRequestError } from '../../../../shared/domain/errors/http-errors';
 import { PostgresAuthRepository } from '../../infrastructure/repositories/postgres-auth.repository';
-import { LoginUserRequest, LoginUserResponse } from '../login.dto';
+import { LoginUserRequest, LoginUserResponse } from '../dtos/login.dto';
 
 export class LoginUserUseCase implements UseCase<LoginUserRequest, LoginUserResponse> {
     constructor(private readonly userRepository: PostgresAuthRepository) { }

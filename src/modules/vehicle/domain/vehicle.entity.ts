@@ -76,6 +76,7 @@ export class Vehicle extends Entity<number> {
   }
 
   private validateLicensePlate(plate: string): boolean {
-    return RegExp(/^[A-Z]{3}[- ]?[0-9]{4}$/).test(plate);// Format ABC-1234
+    return RegExp(/^[A-Z]{3}[- ]?\d{4}$/).test(plate); // Format ABC-1234
   }
 }
+  

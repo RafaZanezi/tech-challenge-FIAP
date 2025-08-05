@@ -1,4 +1,4 @@
-import { UserRole } from '../../../shared/domain/enums/user-role.enum';
+import { UserRole } from '../../../../shared/domain/enums/user-role.enum';
 
 export interface CreateUserRequest {
   name: string;
