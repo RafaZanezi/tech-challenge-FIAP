@@ -1,11 +1,11 @@
 export enum ServiceOrderStatus {
-    RECEIVED = 'Recebida',
-    IN_DIAGNOSIS = 'Em Diagnóstico',
-    WAITING_FOR_APPROVAL = 'Aguardando Aprovação',
-    APPROVED = 'Aprovada',
-    IN_PROGRESS = 'Em Execução',
-    FINISHED = 'Finalizada',
-    DELIVERED = 'Entregue',
+    RECEIVED = 'RECEIVED',
+    IN_DIAGNOSIS = 'IN_DIAGNOSIS',
+    WAITING_FOR_APPROVAL = 'WAITING_FOR_APPROVAL',
+    APPROVED = 'APPROVED',
+    IN_PROGRESS = 'IN_PROGRESS',
+    FINISHED = 'FINISHED',
+    DELIVERED = 'DELIVERED',
 
-    CANCELLED = 'Cancelada'
+    CANCELLED = 'CANCELLED'
 }

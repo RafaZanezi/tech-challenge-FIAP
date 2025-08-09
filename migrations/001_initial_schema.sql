@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS service_orders (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     finalized_at TIMESTAMP,
     CONSTRAINT finalized_at_status CHECK (
-        (status IN ('FINISHED', 'CANCELLED') AND finalized_at IS NOT NULL)
-        OR (status NOT IN ('FINISHED', 'CANCELLED') AND finalized_at IS NULL)
+        (status IN ('FINISHED', 'CANCELLED', 'DELIVERED') AND finalized_at IS NOT NULL)
+        OR (status NOT IN ('FINISHED', 'CANCELLED', 'DELIVERED') AND finalized_at IS NULL)
     )
 );
