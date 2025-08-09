@@ -29,8 +29,6 @@ export class CreateOSUseCase implements UseCase<CreateServiceOrderRequest, any> 
             throw new ConflictError('Cliente não encontrado');
         }
         
-        console.log(client);
-
         const serviceOrder = new ServiceOrder({
             clientId: client.id,
             vehicleId: request.vehicleId,
