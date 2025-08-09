@@ -109,7 +109,8 @@ export class PostgresServiceOrderRepository implements ServiceOrderRepository {
                         SELECT COALESCE(SUM(sup.price), 0)
                         FROM jsonb_array_elements(t.supplies::jsonb) AS js
                         JOIN supplies sup ON sup.id = (js->>'id')::int
-                    ) AS total_value
+                    ) AS total_value,
+                    t.finalized_at
                 FROM service_orders t;
                 `
             );

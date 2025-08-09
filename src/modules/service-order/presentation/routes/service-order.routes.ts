@@ -5,9 +5,12 @@ const routerServiceOrders = express.Router();
 
 const serviceController = makeOSController();
 
+routerServiceOrders.get('/service-order/average-time', serviceController.time);
+
 routerServiceOrders.post('/service-order', serviceController.create);
 routerServiceOrders.get('/service-order', serviceController.find);
 routerServiceOrders.get('/service-order/:id', serviceController.find);
+
 
 routerServiceOrders.put('/service-order/:id/start-diagnosis', serviceController.startDiagnosis);
 routerServiceOrders.put('/service-order/:id/update-diagnosis', serviceController.update);

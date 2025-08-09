@@ -5,7 +5,7 @@ import { FindOSUseCase } from '../../application/use-cases/find-os.use-case';
 import { UpdateOSUseCase } from '../../application/use-cases/update-os.use-case';
 import { UpdateServicesAndSuppliesUseCase } from '../../application/use-cases/update-services-and-supplies.use-case';
 
-export default class ServiceOrderController { 
+export default class ServiceOrderController {
     constructor(
         private readonly createOSUseCase: CreateOSUseCase,
         private readonly updateOSUseCase: UpdateOSUseCase,
@@ -47,7 +47,7 @@ export default class ServiceOrderController {
                 success: true,
                 data: response
             });
-        } catch (error) { 
+        } catch (error) {
             res.status(error?.statusCode ?? 500).json({
                 success: false,
                 message: error?.message ?? 'Ocorreu um erro ao processar'
@@ -79,7 +79,7 @@ export default class ServiceOrderController {
 
     public update = async (req, res) => {
         try {
-            const response = await this.updateServicesAndSuppliesUseCase.execute({id: req.params.id, ...req.body});
+            const response = await this.updateServicesAndSuppliesUseCase.execute({ id: req.params.id, ...req.body });
 
             res.status(200).json({
                 success: true,
@@ -219,6 +219,35 @@ export default class ServiceOrderController {
                 data: response
             });
 
+        } catch (error) {
+            res.status(error?.statusCode ?? 500).json({
+                success: false,
+                message: error?.message ?? 'Ocorreu um erro ao processar'
+            });
+        }
+    }
+
+    public time = async (_, res) => {
+        try {
+            const response = await this.findAllOSUseCase.execute();
+            const totalTime = response.filter(os => !!os.finalizedAt).reduce((acc, os) => {
+                const finalizedAt = new Date(os.finalizedAt);
+                const createdAt = new Date(os.createdAt);
+
+                const diffMs = Math.abs(finalizedAt.getTime() - createdAt.getTime());
+
+                return acc + diffMs;
+            }, 0);
+
+            const averageTime = totalTime / response.length;
+            res.status(200).json({
+                success: true,
+                data: {
+                    averageTimeDays: averageTime / (1000 * 60 * 60 * 24), // em dias
+                    averageTimeHours: averageTime / (1000 * 60 * 60), // em horas
+                    averageTimeInMinutes: averageTime / (1000 * 60) // em minutos
+                }
+            });
         } catch (error) {
             res.status(error?.statusCode ?? 500).json({
                 success: false,
