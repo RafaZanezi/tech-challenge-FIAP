@@ -1,3 +1,4 @@
+import { PostgresClientRepository } from "../../modules/client/infrastructure/repositories/postgres-client.repository";
 import { CreateOSUseCase } from "../../modules/service-order/application/use-cases/create-os.use-case";
 import { FindAllOSUseCase } from "../../modules/service-order/application/use-cases/find-all-os.use-case";
 import { FindOSUseCase } from "../../modules/service-order/application/use-cases/find-os.use-case";
@@ -12,8 +13,9 @@ export function makeOSController(): ServiceOrderController {
     const serviceOrderRepository = new PostgresServiceOrderRepository();
     const servicesRepository = new PostgresServiceRepository();
     const suppliesRepository = new PostgresSupplyRepository();
+    const clientRepository = new PostgresClientRepository();;
 
-    const createOSUseCase = new CreateOSUseCase(serviceOrderRepository);
+    const createOSUseCase = new CreateOSUseCase(serviceOrderRepository, clientRepository);
     const updateOSUseCase = new UpdateOSUseCase(serviceOrderRepository);
     
     const updateServicesAndSuppliesUseCase = new UpdateServicesAndSuppliesUseCase(

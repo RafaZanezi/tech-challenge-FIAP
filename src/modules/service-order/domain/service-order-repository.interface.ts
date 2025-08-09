@@ -5,5 +5,5 @@ export interface ServiceOrderRepository {
     update(id: number, data: any): Promise<ServiceOrder>;
     findAll(): Promise<ServiceOrder[]>;
     findById(id: number): Promise<ServiceOrder | null>;
-    findOpenOSByCarAndClient(carId: number, clientId: number): Promise<ServiceOrder[]>;
+    findOpenOSByCarAndClient(carId: number, client: string): Promise<ServiceOrder[]>;
 }

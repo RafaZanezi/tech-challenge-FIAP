@@ -2,7 +2,7 @@ import { ServiceOrderStatus } from "../../../../shared/domain/enums/service-orde
 
 export interface CreateServiceOrderRequest {
     id: number;
-    clientId: number;
+    client: string;
     vehicleId: number;
     services: number[];
     supplies: number[];

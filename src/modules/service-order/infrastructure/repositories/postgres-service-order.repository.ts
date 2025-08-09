@@ -184,11 +184,14 @@ export class PostgresServiceOrderRepository implements ServiceOrderRepository {
         }
     }
 
-    async findOpenOSByCarAndClient(carId: number, clientId: number): Promise<any> {
+    async findOpenOSByCarAndClient(carId: number, client: string): Promise<any> {
         try {
             const result = await db.query(
-                'SELECT * FROM service_orders WHERE vehicle_id = $1 AND client_id = $2 AND status NOT IN($3, $4, $5)',
-                [carId, clientId, ServiceOrderStatus.CANCELLED, ServiceOrderStatus.FINISHED, ServiceOrderStatus.DELIVERED]
+                `SELECT * FROM 
+                    service_orders so
+                INNER JOIN clients c ON so.client_id = c.id
+                WHERE so.vehicle_id = $1 AND c.identifier = $2 AND so.status NOT IN($3, $4, $5)`,
+                [carId, client, ServiceOrderStatus.CANCELLED, ServiceOrderStatus.FINISHED, ServiceOrderStatus.DELIVERED]
             );
 
             if (result.rows.length === 0) {
