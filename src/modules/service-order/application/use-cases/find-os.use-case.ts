@@ -25,7 +25,8 @@ export class FindOSUseCase implements UseCase<FindOSRequest, FindOSResponse> {
             })),
             createdAt: serviceOrder.createdAt,
             finalizedAt: serviceOrder.finalizedAt,
-            status: serviceOrder.status
+            status: serviceOrder.status,
+            totalPrice: serviceOrder.totalServicePrice
         };
 
     }

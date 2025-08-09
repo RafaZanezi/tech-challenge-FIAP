@@ -39,6 +39,7 @@ export class CreateOSUseCase implements UseCase<CreateServiceOrderRequest, any> 
             createdAt: new Date(),
             finalizedAt: null,
             status: ServiceOrderStatus.RECEIVED,
+            totalServicePrice: 0, // Inicialmente, o preço total é zero
         });
 
         const savedServiceOrder = await this.serviceOrderRepository.create(serviceOrder);

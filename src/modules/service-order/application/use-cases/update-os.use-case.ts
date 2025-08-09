@@ -21,7 +21,8 @@ export class UpdateOSUseCase implements UseCase<UpdateServiceOrderStatusRequest,
             supplies: existingServiceOrder.supplies,
             createdAt: existingServiceOrder.createdAt,
             finalizedAt: request.finishedAt ?? existingServiceOrder.finalizedAt,
-            status: request.status
+            status: request.status,
+            totalServicePrice: existingServiceOrder.totalServicePrice, // Preserving the total service price
         });
 
         const savedServiceOrder = await this.serviceOrderRepository.update(existingServiceOrder.id, serviceOrder);

@@ -13,6 +13,7 @@ export interface FindOSResponse {
     createdAt: Date;
     finalizedAt: Date;
     status: ServiceOrderStatus;
+    totalPrice: number;
 }
 
 interface FindOsServiceResponse {

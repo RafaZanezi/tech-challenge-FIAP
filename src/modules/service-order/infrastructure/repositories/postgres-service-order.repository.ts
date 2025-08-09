@@ -20,7 +20,8 @@ export class PostgresServiceOrderRepository implements ServiceOrderRepository {
                     supplies: row.supplies,
                     status: row.status,
                     createdAt: row.created_at,
-                    finalizedAt: row.finalized_at
+                    finalizedAt: row.finalized_at,
+                    totalServicePrice: row.total_value
                 },
                 row.id
             );
@@ -53,7 +54,8 @@ export class PostgresServiceOrderRepository implements ServiceOrderRepository {
                     supplies: row.supplies,
                     status: row.status,
                     createdAt: row.created_at,
-                    finalizedAt: row.finalized_at
+                    finalizedAt: row.finalized_at,
+                    totalServicePrice: row.total_value
                 },
                 row.id
             );
@@ -89,14 +91,25 @@ export class PostgresServiceOrderRepository implements ServiceOrderRepository {
                         SELECT
                             sup.id,
                             sup.name,
-                            sup.quantity,
                             sup.price
                         FROM jsonb_array_elements(t.supplies::jsonb) AS js
                         JOIN supplies sup ON sup.id = (js->>'id')::int
                         ) AS sup
                     ) AS supplies,
                     t.created_at,
-                    t.status
+                    t.status,
+                    (
+                        -- Soma do total dos serviços
+                        SELECT COALESCE(SUM(s.price), 0)
+                        FROM jsonb_array_elements(t.services::jsonb) AS js
+                        JOIN services s ON s.id = (js->>'id')::int
+                    ) +
+                    (
+                        -- Soma do total das supplies (considerando quantidade)
+                        SELECT COALESCE(SUM(sup.price), 0)
+                        FROM jsonb_array_elements(t.supplies::jsonb) AS js
+                        JOIN supplies sup ON sup.id = (js->>'id')::int
+                    ) AS total_value
                 FROM service_orders t;
                 `
             );
@@ -109,7 +122,8 @@ export class PostgresServiceOrderRepository implements ServiceOrderRepository {
                     supplies: row.supplies,
                     status: row.status,
                     createdAt: row.created_at,
-                    finalizedAt: row.finalized_at
+                    finalizedAt: row.finalized_at,
+                    totalServicePrice: row.total_value
                 },
                 row.id
             ));
@@ -145,7 +159,6 @@ export class PostgresServiceOrderRepository implements ServiceOrderRepository {
                         SELECT
                             sup.id,
                             sup.name,
-                            sup.quantity,
                             sup.price
                         FROM jsonb_array_elements(t.supplies::jsonb) AS js
                         JOIN supplies sup ON sup.id = (js->>'id')::int
@@ -153,7 +166,19 @@ export class PostgresServiceOrderRepository implements ServiceOrderRepository {
                     ) AS supplies,
                     t.created_at,
                     t.status,
-                    t.finalized_at
+                    t.finalized_at,
+                    (
+                        -- Soma do total dos serviços
+                        SELECT COALESCE(SUM(s.price), 0)
+                        FROM jsonb_array_elements(t.services::jsonb) AS js
+                        JOIN services s ON s.id = (js->>'id')::int
+                    ) +
+                    (
+                        -- Soma do total das supplies (considerando quantidade)
+                        SELECT COALESCE(SUM(sup.price), 0)
+                        FROM jsonb_array_elements(t.supplies::jsonb) AS js
+                        JOIN supplies sup ON sup.id = (js->>'id')::int
+                    ) AS total_value
                 FROM service_orders t   
                 WHERE 
                     id = $1`,
@@ -174,7 +199,8 @@ export class PostgresServiceOrderRepository implements ServiceOrderRepository {
                     supplies: row.supplies,
                     status: row.status,
                     createdAt: row.created_at,
-                    finalizedAt: row.finalized_at
+                    finalizedAt: row.finalized_at,
+                    totalServicePrice: row.total_value
                 },
                 row.id
             );
@@ -207,7 +233,8 @@ export class PostgresServiceOrderRepository implements ServiceOrderRepository {
                     supplies: row.supplies,
                     status: row.status,
                     createdAt: row.created_at,
-                    finalizedAt: row.finalized_at
+                    finalizedAt: row.finalized_at,
+                    totalServicePrice: row.total_value
                 },
                 row.id
             );

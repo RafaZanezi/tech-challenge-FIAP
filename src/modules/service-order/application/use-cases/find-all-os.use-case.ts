@@ -25,7 +25,8 @@ export class FindAllOSUseCase implements UseCase<any, FindOSResponse[]> {
             })),
             createdAt: serviceOrder.createdAt,
             finalizedAt: serviceOrder.finalizedAt,
-            status: serviceOrder.status
+            status: serviceOrder.status,
+            totalPrice: serviceOrder.totalServicePrice
         }));
     }
 }

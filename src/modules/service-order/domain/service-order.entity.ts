@@ -12,6 +12,7 @@ export interface ServiceOrderProps {
     createdAt: Date;
     finalizedAt: Date;
     status: ServiceOrderStatus;
+    totalServicePrice: number;
 }
 
 export class ServiceOrder extends Entity<number> {
@@ -42,6 +43,10 @@ export class ServiceOrder extends Entity<number> {
 
     get status(): ServiceOrderStatus {
         return this.props.status;
+    }
+
+    get totalServicePrice(): number {
+        return this.props.totalServicePrice;
     }
 
     private readonly props: ServiceOrderProps;
