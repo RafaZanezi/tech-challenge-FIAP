@@ -38,7 +38,11 @@ Edite o arquivo `.env` com suas configurações de banco de dados e JWT secret.
 npm start
 ```
 
+6. Se preferir, utilize o docker-compose na pasta raiz com o comando: 
+```docker-compose up```
+
 O servidor estará rodando em `http://localhost:3000`.
+As APIs do projeto podem ser consultadas em `https://doc.echoapi.com/docs/4d94dde19002000?locale=en&target_id=194d56ed7120a0`
 
 ## 📋 Fluxo de Ordem de Serviço
 

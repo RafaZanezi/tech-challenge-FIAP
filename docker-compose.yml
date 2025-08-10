@@ -1,0 +1,46 @@
+services:
+  app:
+    build: .
+    container_name: tech_challenge_app
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    working_dir: /app
+    networks:
+      - fiapnet
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgres://postgres:admin@db:5432/postgres
+    command: >
+      sh -c "
+        npm run migrate &&
+        echo 'Database is ready, starting the app...' &&
+        npm start "
+
+  db:
+    image: postgres:15
+    container_name: tech_challenge_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - fiapnet
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h localhost -U postgres"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  db_data:
+
+networks:
+  fiapnet:
