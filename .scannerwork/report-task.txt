@@ -2,5 +2,5 @@ projectKey=tech-challenge-FIAP
 serverUrl=http://localhost:9000
 serverVersion=25.8.0.112029
 dashboardUrl=http://localhost:9000/dashboard?id=tech-challenge-FIAP
-ceTaskId=17a912b6-d1e4-4eb8-8525-e89d3027132b
-ceTaskUrl=http://localhost:9000/api/ce/task?id=17a912b6-d1e4-4eb8-8525-e89d3027132b
+ceTaskId=20bb9496-6638-4f1c-a6ce-cfed643cc5a6
+ceTaskUrl=http://localhost:9000/api/ce/task?id=20bb9496-6638-4f1c-a6ce-cfed643cc5a6
