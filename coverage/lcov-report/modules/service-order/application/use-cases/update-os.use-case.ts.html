@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">33.33% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>9/9</span>
+                <span class='fraction'>3/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>6/6</span>
+                <span class='fraction'>0/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>1/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">33.33% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>9/9</span>
+                <span class='fraction'>3/9</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -102,24 +102,21 @@
 <a name='L37'></a><a href='#L37'>37</a>
 <a name='L38'></a><a href='#L38'>38</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">25x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">22x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -127,9 +124,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -146,14 +146,14 @@ export class UpdateOSUseCase implements UseCase&lt;UpdateServiceOrderStatusReque
 &nbsp;
     constructor(private readonly serviceOrderRepository: ServiceOrderRepository) { }
 &nbsp;
-    async execute(request: UpdateServiceOrderStatusRequest): Promise&lt;UpdateServiceOrderStatusResponse&gt; {
-        const existingServiceOrder = await this.serviceOrderRepository.findById(request.id);
+    async <span class="fstat-no" title="function not covered" >execute(</span>request: UpdateServiceOrderStatusRequest): Promise&lt;UpdateServiceOrderStatusResponse&gt; {
+        const existingServiceOrder = <span class="cstat-no" title="statement not covered" >await this.serviceOrderRepository.findById(request.id);</span>
 &nbsp;
-        if (!existingServiceOrder) {
-            throw new Error(`Ordem de serviço com ID ${request.id} não encontrada.`);
+<span class="cstat-no" title="statement not covered" >        if (!existingServiceOrder) {</span>
+<span class="cstat-no" title="statement not covered" >            throw new Error(`Ordem de serviço com ID ${request.id} não encontrada.`);</span>
         }
 &nbsp;
-        const serviceOrder = new ServiceOrder({
+        const serviceOrder = <span class="cstat-no" title="statement not covered" >new ServiceOrder({</span>
             clientId: existingServiceOrder.clientId,
             vehicleId: existingServiceOrder.vehicleId,
             services: existingServiceOrder.services,
@@ -164,9 +164,9 @@ export class UpdateOSUseCase implements UseCase&lt;UpdateServiceOrderStatusReque
             totalServicePrice: existingServiceOrder.totalServicePrice, // Preserving the total service price
         });
 &nbsp;
-        const savedServiceOrder = await this.serviceOrderRepository.update(existingServiceOrder.id, serviceOrder);
+        const savedServiceOrder = <span class="cstat-no" title="statement not covered" >await this.serviceOrderRepository.update(existingServiceOrder.id, serviceOrder);</span>
 &nbsp;
-        return {
+<span class="cstat-no" title="statement not covered" >        return {</span>
             id: savedServiceOrder.id,
             createdAt: savedServiceOrder.createdAt,
             finalizedAt: savedServiceOrder.finalizedAt,
@@ -181,7 +181,7 @@ export class UpdateOSUseCase implements UseCase&lt;UpdateServiceOrderStatusReque
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-08-12T21:21:19.798Z
+                at 2025-08-12T21:26:15.422Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

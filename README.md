@@ -184,4 +184,6 @@ O sistema está configurado para rodar com **nodemon**, recompilando automaticam
 ## Cobertura de testes
 Para rodar os testes unitários execute o comando `npm run test`
 
+![Cobertura de testes](image.png)
+
 Para rodar os testes de integração execute o comando `npm run test:integration`

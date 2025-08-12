@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">28.57% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>7/7</span>
+                <span class='fraction'>2/7</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">20% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>5/5</span>
+                <span class='fraction'>1/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">33.33% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>6/6</span>
+                <span class='fraction'>2/6</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -99,23 +99,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -135,19 +135,19 @@ export class FindAllOSUseCase implements UseCase&lt;any, FindOSResponse[]&gt; {
 &nbsp;
     constructor(private readonly serviceOrderRepository: ServiceOrderRepository) { }
 &nbsp;
-    async execute(): Promise&lt;FindOSResponse[]&gt; {
-        const serviceOrders = await this.serviceOrderRepository.findAll();
+    async <span class="fstat-no" title="function not covered" >execute(</span>): Promise&lt;FindOSResponse[]&gt; {
+        const serviceOrders = <span class="cstat-no" title="statement not covered" >await this.serviceOrderRepository.findAll();</span>
 &nbsp;
-        return serviceOrders.map(serviceOrder =&gt; ({
+<span class="cstat-no" title="statement not covered" >        return serviceOrders.map(<span class="fstat-no" title="function not covered" >serviceOrder </span>=&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
             id: serviceOrder.id,
             clientId: serviceOrder.clientId,
             vehicleId: serviceOrder.vehicleId,
-            services: serviceOrder.services.map(service =&gt; ({
+            services: serviceOrder.services.map(<span class="fstat-no" title="function not covered" >service </span>=&gt; (<span class="cstat-no" title="statement not covered" >{</span>
                 name: service.name,
                 description: service.description,
                 price: service.price
             })),
-            supplies: serviceOrder.supplies.map(supply =&gt; ({
+            supplies: serviceOrder.supplies.map(<span class="fstat-no" title="function not covered" >supply </span>=&gt; (<span class="cstat-no" title="statement not covered" >{</span>
                 name: supply.name,
                 quantity: supply.quantity,
                 price: supply.price
@@ -166,7 +166,7 @@ export class FindAllOSUseCase implements UseCase&lt;any, FindOSResponse[]&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-08-12T21:21:19.798Z
+                at 2025-08-12T21:26:15.422Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>
