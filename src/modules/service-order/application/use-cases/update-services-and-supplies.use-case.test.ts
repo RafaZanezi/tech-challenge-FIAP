@@ -58,6 +58,18 @@ describe('UpdateServicesAndSuppliesUseCase', () => {
         ).rejects.toThrow(NotFoundError);
     });
 
+    it('should throw NotFoundError if second service does not exist in multiple services', async () => {
+        serviceOrderRepository.findById.mockResolvedValue(mockServiceOrder);
+        servicesRepository.findById
+            .mockResolvedValueOnce(mockService) // first service exists
+            .mockResolvedValueOnce(null); // second service doesn't exist
+        suppliesRepository.findById.mockResolvedValue(mockSupply);
+
+        await expect(
+            useCase.execute({ id: 1, services: [10, 11], supplies: [20] })
+        ).rejects.toThrow(NotFoundError);
+    });
+
     it('should throw NotFoundError if a supply does not exist', async () => {
         serviceOrderRepository.findById.mockResolvedValue(mockServiceOrder);
         servicesRepository.findById.mockResolvedValue(mockService);
@@ -65,6 +77,18 @@ describe('UpdateServicesAndSuppliesUseCase', () => {
 
         await expect(
             useCase.execute({ id: 1, services: [10], supplies: [20] })
+        ).rejects.toThrow(NotFoundError);
+    });
+
+    it('should throw NotFoundError if second supply does not exist in multiple supplies', async () => {
+        serviceOrderRepository.findById.mockResolvedValue(mockServiceOrder);
+        servicesRepository.findById.mockResolvedValue(mockService);
+        suppliesRepository.findById
+            .mockResolvedValueOnce(mockSupply) // first supply exists
+            .mockResolvedValueOnce(null); // second supply doesn't exist
+
+        await expect(
+            useCase.execute({ id: 1, services: [10], supplies: [20, 21] })
         ).rejects.toThrow(NotFoundError);
     });
 
