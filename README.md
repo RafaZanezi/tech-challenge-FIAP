@@ -180,3 +180,8 @@ O sistema utiliza PostgreSQL com schema bem definido incluindo:
 7. **Veículo entregue** → Status: `DELIVERED`
 
 O sistema está configurado para rodar com **nodemon**, recompilando automaticamente o TypeScript a cada mudança através do comando
+
+## Cobertura de testes
+Para rodar os testes unitários execute o comando `npm run test`
+
+Para rodar os testes de integração execute o comando `npm run test:integration`
