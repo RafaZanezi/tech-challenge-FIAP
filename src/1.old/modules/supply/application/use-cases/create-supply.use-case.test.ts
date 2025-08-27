@@ -1,7 +1,7 @@
 import { CreateSupplyUseCase } from './create-supply.use-case';
 import { SupplyRepository } from '../../domain/supply-repository.interface';
 import { Supply } from '../../../../../entities/supply';
-import { ConflictError } from '../../../../shared/domain/errors/domain-errors';
+import { ConflictError } from '../../../../../usecases/errors/errors';
 
 describe('CreateSupplyUseCase', () => {
     let useCase: CreateSupplyUseCase;

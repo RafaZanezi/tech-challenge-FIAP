@@ -1,8 +1,8 @@
 import bcrypt from 'bcrypt';
-import { BadRequestError } from '../../../../shared/domain/errors/http-errors';
 import { AuthRepository } from '../../domain/auth-repository.interface';
 import { User } from '../../../../../entities/user';
 import db from '../../../../shared/infrastructure/database/connection';
+import { BadRequestError } from '../../../../../api/errors/http-errors';
 
 export class PostgresAuthRepository implements AuthRepository {
     public async registerUser(name: string, password: string, role: string): Promise<User> {

@@ -25,11 +25,11 @@ export class ClientGateway implements ClientGatewayInterface {
     }
 
     insert(entity: Client): Promise<Client> {
-        return this.queries.insert(this.tableName, entity);
+        return this.queries.insert<Client>(this.tableName, entity);
     }
 
     update(id: number, entity: Partial<Client>): Promise<Client> {
-        return this.queries.update(this.tableName, id, entity);
+        return this.queries.update<Client>(this.tableName, id, entity);
     }
 
     delete(id: number): Promise<void> {

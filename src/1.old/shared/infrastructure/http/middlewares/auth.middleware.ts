@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { UserRole } from '../../../domain/enums/user-role.enum';
-import { ForbiddenError, UnauthorizedError } from '../../../domain/errors/http-errors';
+import { UnauthorizedError, ForbiddenError } from '../../../../../api/errors/http-errors';
+// import { ForbiddenError, UnauthorizedError } from '../../../domain/errors/http-errors';
 
 export interface AuthenticatedRequest extends Request {
   user?: {

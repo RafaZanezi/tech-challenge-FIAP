@@ -1,5 +1,5 @@
 import { UpdateServicesAndSuppliesUseCase } from './update-services-and-supplies.use-case';
-import { NotFoundError } from '../../../../shared/domain/errors/domain-errors';
+import { NotFoundError } from '../../../../../usecases/errors/errors';
 
 describe('UpdateServicesAndSuppliesUseCase', () => {
     let serviceOrderRepository: any;

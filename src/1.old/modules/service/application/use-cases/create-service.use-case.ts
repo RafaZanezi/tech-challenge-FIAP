@@ -1,5 +1,5 @@
 import { UseCase } from '../../../../shared/application/interfaces/use-case.interface';
-import { ConflictError } from '../../../../shared/domain/errors/domain-errors';
+import { ConflictError } from '../../../../../usecases/errors/errors';
 import { ServiceRepository } from '../../domain/service-repository.interface';
 import { Service } from '../../../../../entities/service';
 import { CreateServiceRequest, CreateServiceResponse } from '../dtos/create-service.dto';

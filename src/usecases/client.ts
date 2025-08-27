@@ -1,3 +1,5 @@
+import { ConflictError } from "./errors/errors";
+import { ConflictHttpError } from "../api/errors/http-errors";
 import { Client } from "../entities/client";
 import { ClientGatewayInterface } from "../interfaces/gateways";
 
@@ -9,7 +11,7 @@ export class ClientUseCases {
       const existingClient = await this.clientGateway.findByIdentifier(data.identifier);
 
       if (existingClient) {
-        //   throw new ConflictError('Cliente com este identificador já existe');
+        throw new ConflictError('Cliente com este identificador já existe');
       }
 
       const client = new Client({
@@ -19,10 +21,12 @@ export class ClientUseCases {
 
       const savedClient = await this.clientGateway.insert(client);
 
+      console.log(savedClient)
+
       return savedClient;
     } catch (error) {
       console.error('Erro ao criar cliente:', error);
-      // throw new ConflictHttpError('Falha ao criar cliente');
+      throw new ConflictHttpError('Falha ao criar cliente');
     }
   }
 

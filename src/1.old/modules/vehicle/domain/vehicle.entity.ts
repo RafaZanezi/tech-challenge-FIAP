@@ -1,5 +1,5 @@
 import { Entity } from '../../../shared/domain/entities/entity';
-import { ValidationError } from '../../../shared/domain/errors/domain-errors';
+import { ValidationError } from '../../../../usecases/errors/errors';
 
 export interface VehicleProps {
   brand: string;

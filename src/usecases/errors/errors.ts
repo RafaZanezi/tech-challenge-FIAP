@@ -1,4 +1,4 @@
-import { BadRequestError, ConflictHttpError, NotFoundHttpError } from './http-errors';
+import { BadRequestError, ConflictHttpError, NotFoundHttpError } from "../../api/errors/http-errors";
 
 export abstract class DomainError extends Error {
   constructor(message: string) {

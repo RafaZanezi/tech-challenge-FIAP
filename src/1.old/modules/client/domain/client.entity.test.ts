@@ -1,5 +1,5 @@
 import { Client, ClientProps } from '../../../../entities/client';
-import { ValidationError } from '../../../shared/domain/errors/domain-errors';
+import { ValidationError } from '../../../../usecases/errors/errors';
 
 describe('Client Entity', () => {
     const validCPF = '11144477735'; // CPF válido para testes

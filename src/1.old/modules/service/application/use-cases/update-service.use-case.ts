@@ -1,5 +1,5 @@
 import { UseCase } from '../../../../shared/application/interfaces/use-case.interface';
-import { NotFoundError } from '../../../../shared/domain/errors/domain-errors';
+import { NotFoundError } from '../../../../../usecases/errors/errors';
 import { ServiceRepository } from '../../domain/service-repository.interface';
 import { UpdateServiceRequest, UpdateServiceResponse } from '../dtos/update-service.dto';
 

@@ -1,5 +1,5 @@
 import { UseCase } from '../../../../shared/application/interfaces/use-case.interface';
-import { ConflictError } from '../../../../shared/domain/errors/domain-errors';
+import { ConflictError } from '../../../../../usecases/errors/errors';
 import { SupplyRepository } from '../../domain/supply-repository.interface';
 import { Supply } from '../../../../../entities/supply';
 import { CreateSupplyRequest, CreateSupplyResponse } from '../dtos/create-supply.dto';

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ErrorHandler, errorHandler } from './error-handler';
-import { ConflictError, NotFoundError, ValidationError } from '../../domain/errors/domain-errors';
-import { BadRequestError } from '../../domain/errors/http-errors';
+import { ConflictError, NotFoundError, ValidationError } from '../../../../usecases/errors/errors';
+import { BadRequestError } from '../../../../api/errors/http-errors';
 
 describe('ErrorHandler', () => {
   let req: Partial<Request>;

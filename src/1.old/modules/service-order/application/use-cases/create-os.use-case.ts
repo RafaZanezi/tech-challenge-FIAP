@@ -1,6 +1,6 @@
 import { UseCase } from "../../../../shared/application/interfaces/use-case.interface";
 import { ServiceOrderStatus } from "../../../../shared/domain/enums/service-order-status.enum";
-import { ConflictError } from "../../../../shared/domain/errors/domain-errors";
+import { ConflictError } from "../../../../../usecases/errors/errors";
 import { ClientRepository } from "../../../client/domain/client-repository.interface";
 import { Service } from "../../../../../entities/service";
 import { Supply } from "../../../../../entities/supply";

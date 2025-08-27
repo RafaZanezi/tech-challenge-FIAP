@@ -1,8 +1,8 @@
 import * as bcrypt from 'bcrypt';
 import { UseCase } from '../../../../shared/application/interfaces/use-case.interface';
-import { BadRequestError, ConflictHttpError } from '../../../../shared/domain/errors/http-errors';
 import { PostgresAuthRepository } from '../../infrastructure/repositories/postgres-auth.repository';
 import { CreateUserRequest, CreateUserResponse } from '../dtos/create-user.dto';
+import { BadRequestError, ConflictHttpError } from '../../../../../api/errors/http-errors';
 
 export class CreateUserUseCase implements UseCase<CreateUserRequest, CreateUserResponse> {
     constructor(private readonly userRepository: PostgresAuthRepository) { }

@@ -1,7 +1,7 @@
 import { CreateServiceUseCase } from './create-service.use-case';
 import { ServiceRepository } from '../../domain/service-repository.interface';
 import { Service } from '../../../../../entities/service';
-import { ConflictError } from '../../../../shared/domain/errors/domain-errors';
+import { ConflictError } from '../../../../../usecases/errors/errors';
 
 describe('CreateServiceUseCase', () => {
     let useCase: CreateServiceUseCase;

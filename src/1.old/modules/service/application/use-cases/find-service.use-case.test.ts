@@ -1,7 +1,7 @@
 import { FindServiceUseCase } from './find-service.use-case';
 import { ServiceRepository } from '../../domain/service-repository.interface';
 import { Service } from '../../../../../entities/service';
-import { NotFoundError } from '../../../../shared/domain/errors/domain-errors';
+import { NotFoundError } from '../../../../../usecases/errors/errors';
 
 describe('FindServiceUseCase', () => {
     let useCase: FindServiceUseCase;

@@ -1,6 +1,5 @@
 import { UseCase } from '../../../../shared/application/interfaces/use-case.interface';
-import { ConflictError } from '../../../../shared/domain/errors/domain-errors';
-import { ConflictHttpError } from '../../../../shared/domain/errors/http-errors';
+import { ConflictError } from '../../../../../usecases/errors/errors';
 import { ClientRepository } from '../../domain/client-repository.interface';
 import { UpdateClientRequest, UpdateClientResponse } from '../dtos/update-client';
 
@@ -26,7 +25,7 @@ export class UpdateClientUseCase implements UseCase<UpdateClientRequest, UpdateC
             };
         } catch (error) {
             console.error('Erro ao atualizar cliente:', error);
-            throw new ConflictHttpError('Falha ao atualizar cliente');
+            // throw new ConflictHttpError('Falha ao atualizar cliente');
         }
     }
 }

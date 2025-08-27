@@ -1,5 +1,5 @@
 import { UseCase } from '../../../../shared/application/interfaces/use-case.interface';
-import { ConflictError } from '../../../../shared/domain/errors/domain-errors';
+import { ConflictError } from '../../../../../usecases/errors/errors';
 import { ClientRepository } from '../../domain/client-repository.interface';
 import { Client } from '../../../../../entities/client';
 import { CreateClientRequest, CreateClientResponse } from '../dtos/create-client';

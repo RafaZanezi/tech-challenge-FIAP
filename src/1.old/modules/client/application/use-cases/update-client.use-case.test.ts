@@ -1,7 +1,7 @@
 import { UpdateClientUseCase } from './update-client.use-case';
 import { ClientRepository } from '../../domain/client-repository.interface';
 import { Client } from '../../../../../entities/client';
-import { ConflictHttpError } from '../../../../shared/domain/errors/http-errors';
+import { ConflictHttpError } from '../../../../../api/errors/http-errors';
 
 describe('UpdateClientUseCase', () => {
     let useCase: UpdateClientUseCase;

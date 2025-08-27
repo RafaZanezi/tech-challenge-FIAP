@@ -2,7 +2,7 @@ import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { verifyJWT, requireAdmin, addToBlacklist, clearBlacklist, AuthenticatedRequest } from './auth.middleware';
 import { UserRole } from '../../../domain/enums/user-role.enum';
-import { ForbiddenError, UnauthorizedError } from '../../../domain/errors/http-errors';
+import { UnauthorizedError, ForbiddenError } from '../../../../../api/errors/http-errors';
 
 // Mock jwt
 jest.mock('jsonwebtoken');

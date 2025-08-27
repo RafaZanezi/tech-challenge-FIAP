@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { UnauthorizedError, ForbiddenError } from '../../1.old/shared/domain/errors/http-errors';
 import { UserRole } from '../../entities/user-new';
+import { ForbiddenError, UnauthorizedError } from '../errors/http-errors';
 
 export interface AuthenticatedRequest extends Request {
   user?: {
@@ -77,8 +77,8 @@ const clearBlacklist = (): void => {
 };
 
 export {
-    addToBlacklist,
-    clearBlacklist, requireAdmin, verifyJWT
+  addToBlacklist,
+  clearBlacklist, requireAdmin, verifyJWT
 };
 
 export default verifyJWT;

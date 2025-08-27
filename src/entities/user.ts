@@ -1,6 +1,6 @@
 import { Entity } from '../1.old/shared/domain/entities/entity';
 import { UserRole } from '../1.old/shared/domain/enums/user-role.enum';
-import { ValidationError } from '../1.old/shared/domain/errors/domain-errors';
+import { ValidationError } from '../usecases/errors/errors';
 
 export interface UserProps {
     id: number;

@@ -1,4 +1,4 @@
-import { HttpError } from '../errors/http-error';
+import { HttpError } from "../../../../api/errors/http-errors";
 
 export type Result<T, E = HttpError> = {
   success: true;

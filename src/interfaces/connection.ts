@@ -1,5 +1,5 @@
 export interface DatabaseConnection {
-    query<T = any>(text: string, params?: any[]): Promise<T>;
+    query(text: string, params?: any[]): Promise<any>;
     connect(): Promise<void>;
     disconnect(): Promise<void>;
 }

@@ -1,5 +1,5 @@
 import { UseCase } from "../../../../shared/application/interfaces/use-case.interface";
-import { NotFoundError } from "../../../../shared/domain/errors/domain-errors";
+import { NotFoundError } from "../../../../../usecases/errors/errors";
 import { ServiceRepository } from "../../../service/domain/service-repository.interface";
 import { SupplyRepository } from "../../../supply/domain/supply-repository.interface";
 import { ServiceOrderRepository } from "../../domain/service-order-repository.interface";

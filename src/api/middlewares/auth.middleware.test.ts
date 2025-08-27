@@ -1,8 +1,8 @@
-import { Response, NextFunction } from 'express';
+import { NextFunction, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { verifyJWT, requireAdmin, addToBlacklist, clearBlacklist, AuthenticatedRequest } from './auth.middleware';
-import { UnauthorizedError, ForbiddenError } from '../../1.old/shared/domain/errors/http-errors';
 import { UserRole } from '../../entities/user-new';
+import { ForbiddenError, UnauthorizedError } from '../errors/http-errors';
+import { addToBlacklist, AuthenticatedRequest, clearBlacklist, requireAdmin, verifyJWT } from './auth.middleware';
 
 // Mock jwt
 jest.mock('jsonwebtoken');

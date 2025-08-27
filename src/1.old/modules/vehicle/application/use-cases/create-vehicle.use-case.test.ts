@@ -3,7 +3,7 @@ import { VehicleRepository } from '../../domain/vehicle-repository.interface';
 import { ClientRepository } from '../../../client/domain/client-repository.interface';
 import { Vehicle } from '../../domain/vehicle.entity';
 import { Client } from '../../../../../entities/client';
-import { ConflictError, NotFoundError } from '../../../../shared/domain/errors/domain-errors';
+import { ConflictError, NotFoundError } from '../../../../../usecases/errors/errors';
 
 describe('CreateVehicleUseCase', () => {
     let useCase: CreateVehicleUseCase;

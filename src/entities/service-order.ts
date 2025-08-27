@@ -1,6 +1,6 @@
 import { Entity } from "../1.old/shared/domain/entities/entity";
 import { ServiceOrderStatus } from "../1.old/shared/domain/enums/service-order-status.enum";
-import { ValidationError } from "../1.old/shared/domain/errors/domain-errors";
+import { ValidationError } from "../usecases/errors/errors";
 import { Service } from "./service";
 import { Supply } from "./supply";
 

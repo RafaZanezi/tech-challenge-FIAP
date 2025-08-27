@@ -1,5 +1,5 @@
 import { UseCase } from '../../../../shared/application/interfaces/use-case.interface';
-import { NotFoundError } from '../../../../shared/domain/errors/domain-errors';
+import { NotFoundError } from '../../../../../usecases/errors/errors';
 import { VehicleRepository } from '../../domain/vehicle-repository.interface';
 import { FindVehicleRequest, FindVehicleResponse } from '../dtos/list-vehicle.dto';
 

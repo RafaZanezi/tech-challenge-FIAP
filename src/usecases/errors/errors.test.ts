@@ -1,5 +1,5 @@
-import { BadRequestError, ConflictHttpError, NotFoundHttpError } from '../../../../api/errors/http-errors';
-import { ValidationError, NotFoundError, ConflictError } from '../../../../usecases/errors/errors';
+import { BadRequestError, ConflictHttpError, NotFoundHttpError } from '../../api/errors/http-errors';
+import { ConflictError, NotFoundError, ValidationError } from './errors';
 
 describe('Domain Errors', () => {
   describe('ValidationError', () => {

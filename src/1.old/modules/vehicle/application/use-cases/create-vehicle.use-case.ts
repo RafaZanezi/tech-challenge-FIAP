@@ -1,5 +1,5 @@
 import { UseCase } from '../../../../shared/application/interfaces/use-case.interface';
-import { ConflictError, NotFoundError } from '../../../../shared/domain/errors/domain-errors';
+import { ConflictError, NotFoundError } from '../../../../../usecases/errors/errors';
 import { ClientRepository } from '../../../client/domain/client-repository.interface';
 import { VehicleRepository } from '../../domain/vehicle-repository.interface';
 import { Vehicle } from '../../domain/vehicle.entity';

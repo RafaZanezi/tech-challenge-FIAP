@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { ConflictError, NotFoundError, ValidationError } from '../../../shared/domain/errors/domain-errors';
-import { HttpError } from '../../../shared/domain/errors/http-error';
-import { InternalServerError } from '../../../shared/domain/errors/http-errors';
+import { ConflictError, NotFoundError, ValidationError } from '../../../../usecases/errors/errors';
+import { HttpError, InternalServerError } from '../../../../api/errors/http-errors';
 
 export interface ErrorResponse {
   error: {

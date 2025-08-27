@@ -1,7 +1,7 @@
 import { FindSupplyUseCase } from './find-supply.use-case';
 import { SupplyRepository } from '../../domain/supply-repository.interface';
 import { Supply } from '../../../../../entities/supply';
-import { NotFoundError } from '../../../../shared/domain/errors/domain-errors';
+import { NotFoundError } from '../../../../../usecases/errors/errors';
 
 describe('FindSupplyUseCase', () => {
     let useCase: FindSupplyUseCase;

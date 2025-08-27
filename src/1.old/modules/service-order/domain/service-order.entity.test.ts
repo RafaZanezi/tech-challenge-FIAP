@@ -2,7 +2,7 @@ import { ServiceOrder } from '../../../../entities/service-order';
 import { ServiceOrderStatus } from '../../../shared/domain/enums/service-order-status.enum';
 import { Service } from '../../../../entities/service';
 import { Supply } from '../../../../entities/supply';
-import { ValidationError } from '../../../shared/domain/errors/domain-errors';
+import { ValidationError } from '../../../../usecases/errors/errors';
 
 describe('ServiceOrder Entity', () => {
   let mockService: Service;

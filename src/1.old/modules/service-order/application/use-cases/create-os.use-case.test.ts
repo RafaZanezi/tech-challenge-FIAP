@@ -1,5 +1,5 @@
 import { ServiceOrderStatus } from '../../../../shared/domain/enums/service-order-status.enum';
-import { ConflictError } from '../../../../shared/domain/errors/domain-errors';
+import { ConflictError } from '../../../../../usecases/errors/errors';
 import { ServiceOrder } from '../../../../../entities/service-order';
 import { CreateOSUseCase } from './create-os.use-case';
 

@@ -1,7 +1,7 @@
 import { CreateClientUseCase } from './create-client.use-case';
 import { ClientRepository } from '../../domain/client-repository.interface';
 import { Client } from '../../../../../entities/client';
-import { ConflictError } from '../../../../shared/domain/errors/domain-errors';
+import { ConflictError } from '../../../../../usecases/errors/errors';
 
 describe('CreateClientUseCase', () => {
     let useCase: CreateClientUseCase;

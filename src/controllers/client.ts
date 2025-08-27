@@ -1,6 +1,7 @@
 import { ClientGateway } from "../gateways/client";
 import { DatabaseConnection } from "../interfaces/connection";
 import { ClientGatewayInterface } from "../interfaces/gateways";
+import { ClientUseCases } from "../usecases/client";
 
 export class ClientController {
 
@@ -14,11 +15,11 @@ export class ClientController {
 
   public create = async (req, res) => {
     try {
-      const response = await this.clientGateway.insert(req.body);
+      const client = await new ClientUseCases(this.clientGateway).createClient(req.body);
 
       res.status(201).json({
         success: true,
-        data: response
+        data: client
       });
     } catch (error) {
       res.status(error?.statusCode ?? 500).json({

@@ -1,7 +1,7 @@
 import { FindVehicleUseCase } from './find-vehicle.use-case';
 import { VehicleRepository } from '../../domain/vehicle-repository.interface';
 import { Vehicle } from '../../domain/vehicle.entity';
-import { NotFoundError } from '../../../../shared/domain/errors/domain-errors';
+import { NotFoundError } from '../../../../../usecases/errors/errors';
 
 describe('FindVehicleUseCase', () => {
     let useCase: FindVehicleUseCase;

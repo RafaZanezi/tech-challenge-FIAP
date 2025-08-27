@@ -1,6 +1,6 @@
 import { User, UserProps } from '../../../../entities/user';
 import { UserRole } from '../../../shared/domain/enums/user-role.enum';
-import { ValidationError } from '../../../shared/domain/errors/domain-errors';
+import { ValidationError } from '../../../../usecases/errors/errors';
 
 describe('User Entity', () => {
     describe('Valid User Creation', () => {
