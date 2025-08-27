@@ -1,4 +1,4 @@
-import { Service } from '../../domain/service.entity';
+import { Service } from '../../../../../entities/service';
 import { ServiceRepository } from '../../domain/service-repository.interface';
 import db from '../../../../shared/infrastructure/database/connection';
 

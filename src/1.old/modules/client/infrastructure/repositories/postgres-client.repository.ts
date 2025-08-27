@@ -1,6 +1,6 @@
 import connection from '../../../../shared/infrastructure/database/connection';
 import { ClientRepository } from '../../domain/client-repository.interface';
-import { Client, ClientProps } from '../../domain/client.entity';
+import { Client, ClientProps } from '../../../../../entities/client';
 
 export class PostgresClientRepository implements ClientRepository {
   public async findById(id: number): Promise<Client | null> {

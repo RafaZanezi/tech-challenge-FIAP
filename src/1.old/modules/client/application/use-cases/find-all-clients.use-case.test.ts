@@ -1,6 +1,6 @@
 import { FindAllClientsUseCase } from './find-all-clients.use-case';
 import { ClientRepository } from '../../domain/client-repository.interface';
-import { Client } from '../../domain/client.entity';
+import { Client } from '../../../../../entities/client';
 
 describe('FindAllClientsUseCase', () => {
     let useCase: FindAllClientsUseCase;

@@ -1,5 +1,5 @@
 import { PostgresSupplyRepository } from './postgres-supply.repository';
-import { Supply } from '../../domain/supply.entity';
+import { Supply } from '../../../../../entities/supply';
 import db from '../../../../shared/infrastructure/database/connection';
 
 jest.mock('../../../../shared/infrastructure/database/connection', () => ({

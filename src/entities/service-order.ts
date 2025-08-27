@@ -1,8 +1,8 @@
-import { Entity } from "../../../shared/domain/entities/entity";
-import { ServiceOrderStatus } from "../../../shared/domain/enums/service-order-status.enum";
-import { ValidationError } from "../../../shared/domain/errors/domain-errors";
-import { Service } from "../../service/domain/service.entity";
-import { Supply } from "../../supply/domain/supply.entity";
+import { Entity } from "../1.old/shared/domain/entities/entity";
+import { ServiceOrderStatus } from "../1.old/shared/domain/enums/service-order-status.enum";
+import { ValidationError } from "../1.old/shared/domain/errors/domain-errors";
+import { Service } from "./service";
+import { Supply } from "./supply";
 
 export interface ServiceOrderProps {
     clientId: number;

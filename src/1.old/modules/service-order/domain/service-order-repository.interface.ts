@@ -1,4 +1,4 @@
-import { ServiceOrder } from "./service-order.entity";
+import { ServiceOrder } from "../../../../entities/service-order";
 
 export interface ServiceOrderRepository {
     create(data: any): Promise<ServiceOrder>;

@@ -1,5 +1,5 @@
 import { Repository } from '../../../shared/application/interfaces/repository.interface';
-import { Client } from './client.entity';
+import { Client } from '../../../../entities/client';
 
 export interface ClientRepository extends Repository<Client> {
   findByIdentifier(identifier: string): Promise<Client | null>;

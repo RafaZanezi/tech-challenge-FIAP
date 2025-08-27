@@ -2,7 +2,7 @@ import { UseCase } from '../../../../shared/application/interfaces/use-case.inte
 import { ConflictError } from '../../../../shared/domain/errors/domain-errors';
 import { ConflictHttpError } from '../../../../shared/domain/errors/http-errors';
 import { ClientRepository } from '../../domain/client-repository.interface';
-import { UpdateClientRequest, UpdateClientResponse } from '../dtos/update-client.dto';
+import { UpdateClientRequest, UpdateClientResponse } from '../dtos/update-client';
 
 export class UpdateClientUseCase implements UseCase<UpdateClientRequest, UpdateClientResponse> {
     constructor(private readonly clientRepository: ClientRepository) { }

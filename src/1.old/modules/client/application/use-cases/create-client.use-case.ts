@@ -1,8 +1,8 @@
 import { UseCase } from '../../../../shared/application/interfaces/use-case.interface';
 import { ConflictError } from '../../../../shared/domain/errors/domain-errors';
 import { ClientRepository } from '../../domain/client-repository.interface';
-import { Client } from '../../domain/client.entity';
-import { CreateClientRequest, CreateClientResponse } from '../dtos/create-client.dto';
+import { Client } from '../../../../../entities/client';
+import { CreateClientRequest, CreateClientResponse } from '../dtos/create-client';
 
 export class CreateClientUseCase implements UseCase<CreateClientRequest, CreateClientResponse> {
   constructor(private readonly clientRepository: ClientRepository) {}

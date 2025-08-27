@@ -1,7 +1,7 @@
 import { UseCase } from '../../../../shared/application/interfaces/use-case.interface';
 import { ConflictError } from '../../../../shared/domain/errors/domain-errors';
 import { ServiceRepository } from '../../domain/service-repository.interface';
-import { Service } from '../../domain/service.entity';
+import { Service } from '../../../../../entities/service';
 import { CreateServiceRequest, CreateServiceResponse } from '../dtos/create-service.dto';
 
 export class CreateServiceUseCase implements UseCase<CreateServiceRequest, CreateServiceResponse> {

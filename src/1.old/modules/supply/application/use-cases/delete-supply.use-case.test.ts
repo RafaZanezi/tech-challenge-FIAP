@@ -1,6 +1,6 @@
 import { DeleteSupplyUseCase } from './delete-supply.use-case';
 import { SupplyRepository } from '../../domain/supply-repository.interface';
-import { Supply } from '../../domain/supply.entity';
+import { Supply } from '../../../../../entities/supply';
 import { NotFoundError } from '../../../../shared/domain/errors/domain-errors';
 
 describe('DeleteSupplyUseCase', () => {

@@ -1,6 +1,6 @@
 import { UpdateServiceUseCase } from './update-service.use-case';
 import { ServiceRepository } from '../../domain/service-repository.interface';
-import { Service } from '../../domain/service.entity';
+import { Service } from '../../../../../entities/service';
 import { NotFoundError } from '../../../../shared/domain/errors/domain-errors';
 
 describe('UpdateServiceUseCase', () => {

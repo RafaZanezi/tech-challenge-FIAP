@@ -1,9 +1,9 @@
 import { UpdateOSUseCase } from './update-os.use-case';
 import { ServiceOrderRepository } from '../../domain/service-order-repository.interface';
-import { ServiceOrder } from '../../domain/service-order.entity';
+import { ServiceOrder } from '../../../../../entities/service-order';
 import { UpdateServiceOrderStatusRequest } from '../dtos/update-status-os';
-import { Service } from '../../../service/domain/service.entity';
-import { Supply } from '../../../supply/domain/supply.entity';
+import { Service } from '../../../../../entities/service';
+import { Supply } from '../../../../../entities/supply';
 import { ServiceOrderStatus } from '../../../../shared/domain/enums/service-order-status.enum';
 
 describe('UpdateOSUseCase', () => {

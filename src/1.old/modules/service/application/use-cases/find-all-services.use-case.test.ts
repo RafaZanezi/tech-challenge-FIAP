@@ -1,6 +1,6 @@
 import { FindAllServicesUseCase } from './find-all-services.use-case';
 import { ServiceRepository } from '../../domain/service-repository.interface';
-import { Service } from '../../domain/service.entity';
+import { Service } from '../../../../../entities/service';
 
 describe('FindAllServicesUseCase', () => {
     let findAllServicesUseCase: FindAllServicesUseCase;

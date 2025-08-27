@@ -1,4 +1,4 @@
-import { User } from './user.entity';
+import { User } from '../../../../entities/user';
 
 export interface AuthRepository {
   registerUser(name: string, password: string, role: string): Promise<User>;

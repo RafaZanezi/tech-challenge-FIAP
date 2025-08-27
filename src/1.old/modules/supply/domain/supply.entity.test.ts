@@ -1,4 +1,4 @@
-import { Supply } from './supply.entity';
+import { Supply } from '../../../../entities/supply';
 
 describe('Supply Entity', () => {
     describe('constructor', () => {

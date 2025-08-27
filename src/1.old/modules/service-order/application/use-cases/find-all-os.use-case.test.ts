@@ -1,8 +1,8 @@
 import { ServiceOrderRepository } from '../../domain/service-order-repository.interface';
 import { FindAllOSUseCase } from './find-all-os.use-case';
 import { ServiceOrderStatus } from '../../../../shared/domain/enums/service-order-status.enum';
-import { Service } from '../../../service/domain/service.entity';
-import { ServiceOrder } from '../../domain/service-order.entity';
+import { Service } from '../../../../../entities/service';
+import { ServiceOrder } from '../../../../../entities/service-order';
 
 const mockServiceOrders: ServiceOrder[] = [
     new ServiceOrder({

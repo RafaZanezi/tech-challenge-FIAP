@@ -1,6 +1,6 @@
 import { FindAllSuppliesUseCase } from './find-all-supplies.use-case';
 import { SupplyRepository } from '../../domain/supply-repository.interface';
-import { Supply } from '../../domain/supply.entity';
+import { Supply } from '../../../../../entities/supply';
 
 describe('FindAllSuppliesUseCase', () => {
     let findAllSuppliesUseCase: FindAllSuppliesUseCase;

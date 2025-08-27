@@ -1,6 +1,6 @@
 import { ServiceOrderRepository } from "../../domain/service-order-repository.interface";
 import db from '../../../../shared/infrastructure/database/connection';
-import { ServiceOrder } from "../../domain/service-order.entity";
+import { ServiceOrder } from "../../../../../entities/service-order";
 import { ServiceOrderStatus } from "../../../../shared/domain/enums/service-order-status.enum";
 
 export class PostgresServiceOrderRepository implements ServiceOrderRepository {

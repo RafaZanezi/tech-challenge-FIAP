@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "compile": "tsc && node dist/server.js",
+    "compile": "tsc && node dist/src/app.js",
     "start": "./node_modules/nodemon/bin/nodemon.js -e ts  --exec \"npm run compile\"",
     "lint": "tslint -p tsconfig.json",
     "lint:fix": "tslint -p tsconfig.json --fix",

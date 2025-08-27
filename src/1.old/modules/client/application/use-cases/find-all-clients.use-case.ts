@@ -1,6 +1,6 @@
 import { UseCase } from '../../../../shared/application/interfaces/use-case.interface';
 import { ClientRepository } from '../../domain/client-repository.interface';
-import { FindClientResponse } from '../dtos/list-client.dto';
+import { FindClientResponse } from '../dtos/list-client';
 
 export class FindAllClientsUseCase implements UseCase<void, FindClientResponse[]> {
   constructor(private readonly clientRepository: ClientRepository) {}

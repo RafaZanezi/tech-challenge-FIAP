@@ -1,5 +1,5 @@
-import { Entity } from '../../../shared/domain/entities/entity';
-import { ValidationError } from '../../../shared/domain/errors/domain-errors';
+import { Entity } from '../1.old/shared/domain/entities/entity';
+import { ValidationError } from '../1.old/shared/domain/errors/domain-errors';
 
 export interface SupplyProps {
   name: string;

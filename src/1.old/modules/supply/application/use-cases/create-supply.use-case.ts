@@ -1,7 +1,7 @@
 import { UseCase } from '../../../../shared/application/interfaces/use-case.interface';
 import { ConflictError } from '../../../../shared/domain/errors/domain-errors';
 import { SupplyRepository } from '../../domain/supply-repository.interface';
-import { Supply } from '../../domain/supply.entity';
+import { Supply } from '../../../../../entities/supply';
 import { CreateSupplyRequest, CreateSupplyResponse } from '../dtos/create-supply.dto';
 
 export class CreateSupplyUseCase implements UseCase<CreateSupplyRequest, CreateSupplyResponse> {

@@ -1,5 +1,5 @@
 import { PostgresServiceRepository } from './postgres-service.repository';
-import { Service } from '../../domain/service.entity';
+import { Service } from '../../../../../entities/service';
 import db from '../../../../shared/infrastructure/database/connection';
 
 jest.mock('../../../../shared/infrastructure/database/connection', () => ({

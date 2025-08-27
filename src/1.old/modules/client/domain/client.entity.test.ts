@@ -1,4 +1,4 @@
-import { Client, ClientProps } from './client.entity';
+import { Client, ClientProps } from '../../../../entities/client';
 import { ValidationError } from '../../../shared/domain/errors/domain-errors';
 
 describe('Client Entity', () => {

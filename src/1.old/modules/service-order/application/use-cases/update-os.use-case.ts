@@ -1,6 +1,6 @@
 import { UseCase } from "../../../../shared/application/interfaces/use-case.interface";
 import { ServiceOrderRepository } from "../../domain/service-order-repository.interface";
-import { ServiceOrder } from "../../domain/service-order.entity";
+import { ServiceOrder } from "../../../../../entities/service-order";
 import { UpdateServiceOrderStatusRequest, UpdateServiceOrderStatusResponse } from "../dtos/update-status-os";
 
 export class UpdateOSUseCase implements UseCase<UpdateServiceOrderStatusRequest, UpdateServiceOrderStatusResponse> {

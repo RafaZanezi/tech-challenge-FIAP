@@ -15,7 +15,7 @@ const routes = (app) => {
     app.use('/auth', routerAuth);
 
     app.use('/api', routerClients);
-    app.use('/api', routerClients);
+    // app.use('/api', routerClients);
     app.use('/api', routerServices);
     app.use('/api', routerVehicles);
     app.use('/api', routerSupplies);

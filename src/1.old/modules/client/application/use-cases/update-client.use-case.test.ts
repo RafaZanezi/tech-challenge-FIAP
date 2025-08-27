@@ -1,6 +1,6 @@
 import { UpdateClientUseCase } from './update-client.use-case';
 import { ClientRepository } from '../../domain/client-repository.interface';
-import { Client } from '../../domain/client.entity';
+import { Client } from '../../../../../entities/client';
 import { ConflictHttpError } from '../../../../shared/domain/errors/http-errors';
 
 describe('UpdateClientUseCase', () => {

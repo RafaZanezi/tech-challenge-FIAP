@@ -1,6 +1,6 @@
 import { ServiceOrderStatus } from '../../../../shared/domain/enums/service-order-status.enum';
 import { ConflictError } from '../../../../shared/domain/errors/domain-errors';
-import { ServiceOrder } from '../../domain/service-order.entity';
+import { ServiceOrder } from '../../../../../entities/service-order';
 import { CreateOSUseCase } from './create-os.use-case';
 
 const mockServiceOrderRepository = {

@@ -1,8 +1,8 @@
 import { PostgresServiceOrderRepository } from './postgres-service-order.repository';
-import { ServiceOrder } from '../../domain/service-order.entity';
+import { ServiceOrder } from '../../../../../entities/service-order';
 import { ServiceOrderStatus } from '../../../../shared/domain/enums/service-order-status.enum';
-import { Service } from '../../../service/domain/service.entity';
-import { Supply } from '../../../supply/domain/supply.entity';
+import { Service } from '../../../../../entities/service';
+import { Supply } from '../../../../../entities/supply';
 import db from '../../../../shared/infrastructure/database/connection';
 
 // Mock the database connection

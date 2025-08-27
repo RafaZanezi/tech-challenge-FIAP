@@ -1,4 +1,4 @@
-import { User, UserProps } from './user.entity';
+import { User, UserProps } from '../../../../entities/user';
 import { UserRole } from '../../../shared/domain/enums/user-role.enum';
 import { ValidationError } from '../../../shared/domain/errors/domain-errors';
 

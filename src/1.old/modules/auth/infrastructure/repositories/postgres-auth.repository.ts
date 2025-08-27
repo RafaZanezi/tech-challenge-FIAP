@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { BadRequestError } from '../../../../shared/domain/errors/http-errors';
 import { AuthRepository } from '../../domain/auth-repository.interface';
-import { User } from '../../domain/user.entity';
+import { User } from '../../../../../entities/user';
 import db from '../../../../shared/infrastructure/database/connection';
 
 export class PostgresAuthRepository implements AuthRepository {

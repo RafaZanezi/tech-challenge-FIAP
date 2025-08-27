@@ -2,10 +2,10 @@ import { UseCase } from "../../../../shared/application/interfaces/use-case.inte
 import { ServiceOrderStatus } from "../../../../shared/domain/enums/service-order-status.enum";
 import { ConflictError } from "../../../../shared/domain/errors/domain-errors";
 import { ClientRepository } from "../../../client/domain/client-repository.interface";
-import { Service } from "../../../service/domain/service.entity";
-import { Supply } from "../../../supply/domain/supply.entity";
+import { Service } from "../../../../../entities/service";
+import { Supply } from "../../../../../entities/supply";
 import { ServiceOrderRepository } from "../../domain/service-order-repository.interface";
-import { ServiceOrder } from "../../domain/service-order.entity";
+import { ServiceOrder } from "../../../../../entities/service-order";
 import { CreateServiceOrderRequest } from "../dtos/create-os.dto";
 
 export class CreateOSUseCase implements UseCase<CreateServiceOrderRequest, any> {

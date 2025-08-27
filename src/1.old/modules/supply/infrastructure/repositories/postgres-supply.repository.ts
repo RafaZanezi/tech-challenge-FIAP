@@ -1,4 +1,4 @@
-import { Supply } from '../../domain/supply.entity';
+import { Supply } from '../../../../../entities/supply';
 import { SupplyRepository } from '../../domain/supply-repository.interface';
 import db from '../../../../shared/infrastructure/database/connection';
 

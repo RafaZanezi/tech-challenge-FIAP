@@ -1,7 +1,7 @@
-import { ServiceOrder } from './service-order.entity';
+import { ServiceOrder } from '../../../../entities/service-order';
 import { ServiceOrderStatus } from '../../../shared/domain/enums/service-order-status.enum';
-import { Service } from '../../service/domain/service.entity';
-import { Supply } from '../../supply/domain/supply.entity';
+import { Service } from '../../../../entities/service';
+import { Supply } from '../../../../entities/supply';
 import { ValidationError } from '../../../shared/domain/errors/domain-errors';
 
 describe('ServiceOrder Entity', () => {

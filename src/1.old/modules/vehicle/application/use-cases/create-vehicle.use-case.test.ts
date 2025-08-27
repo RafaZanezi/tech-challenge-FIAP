@@ -2,7 +2,7 @@ import { CreateVehicleUseCase } from './create-vehicle.use-case';
 import { VehicleRepository } from '../../domain/vehicle-repository.interface';
 import { ClientRepository } from '../../../client/domain/client-repository.interface';
 import { Vehicle } from '../../domain/vehicle.entity';
-import { Client } from '../../../client/domain/client.entity';
+import { Client } from '../../../../../entities/client';
 import { ConflictError, NotFoundError } from '../../../../shared/domain/errors/domain-errors';
 
 describe('CreateVehicleUseCase', () => {

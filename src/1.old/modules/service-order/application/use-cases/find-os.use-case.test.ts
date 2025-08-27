@@ -1,9 +1,9 @@
 import { FindOSUseCase } from './find-os.use-case';
 import { ServiceOrderRepository } from '../../domain/service-order-repository.interface';
 import { FindOSRequest } from '../dtos/find-os.dto';
-import { ServiceOrder } from '../../domain/service-order.entity';
-import { Service } from '../../../service/domain/service.entity';
-import { Supply } from '../../../supply/domain/supply.entity';
+import { ServiceOrder } from '../../../../../entities/service-order';
+import { Service } from '../../../../../entities/service';
+import { Supply } from '../../../../../entities/supply';
 import { ServiceOrderStatus } from '../../../../shared/domain/enums/service-order-status.enum';
 
 describe('FindOSUseCase', () => {
