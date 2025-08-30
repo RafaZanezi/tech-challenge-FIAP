@@ -1,4 +1,4 @@
-import { Entity } from './entity';
+import { Entity } from "./entity";
 
 class TestEntity extends Entity<number> {
   private readonly value: string;

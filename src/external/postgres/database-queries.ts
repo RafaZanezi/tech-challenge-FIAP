@@ -14,15 +14,27 @@ export class PostgresConnection {
 
         const query = `SELECT ${selectFields} FROM ${table} WHERE ${whereClause}`;
         const result = await this.db.query(query, paramValues);
-
-        return Array.isArray(result) && result.length > 0 ? result[0] : null as T;
+        
+        return result.rows[0] as T;
     }
 
     async findAll<T>(table: string, fields: string[] | null): Promise<T> {
         const selectFields = fields ? fields.join(", ") : "*";
         const query = `SELECT ${selectFields} FROM ${table}`;
+        const result = await this.db.query(query);
 
-        return this.db.query(query);
+        return result.rows as T;
+    }
+
+    async findAllByParams<T>(table: string, fields: string[] | null, params: Record<string, any>): Promise<T[]> {
+        const selectFields = fields ? fields.join(", ") : "*";
+        const whereClause = this.buildWhereClause(params);
+        const paramValues = Object.values(params);
+
+        const query = `SELECT ${selectFields} FROM ${table} WHERE ${whereClause}`;
+        const result = await this.db.query(query, paramValues);
+
+        return result.rows as T[];
     }
 
     async insert<T>(table: string, data: T): Promise<T> {
@@ -34,8 +46,6 @@ export class PostgresConnection {
 
         const query = `INSERT INTO ${table} (${keys.join(", ")}) VALUES (${placeholders}) RETURNING *`;
        
-        console.log(query);
-
         const result = await this.db.query(query, values);
 
         return result.rows[0] as T;
@@ -48,7 +58,7 @@ export class PostgresConnection {
         const query = `UPDATE ${table} SET ${setClause} WHERE id = $${values.length + 1} RETURNING *`;
         const result = await this.db.query(query, [...values, id]);
 
-        return Array.isArray(result) && result.length > 0 ? result[0] : result as T;
+        return result.rows[0] as T;
     }
 
     async delete(table: string, id: number): Promise<void> {

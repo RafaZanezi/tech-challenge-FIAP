@@ -7,15 +7,17 @@ export class ClientController {
 
   private dbConnection: DatabaseConnection;
   private clientGateway: ClientGatewayInterface;
+  private clientUseCase: ClientUseCases;
 
   constructor(dbConnection: DatabaseConnection) {
     this.dbConnection = dbConnection;
     this.clientGateway = new ClientGateway(this.dbConnection);
+    this.clientUseCase = new ClientUseCases(this.clientGateway);
   }
 
   public create = async (req, res) => {
     try {
-      const client = await new ClientUseCases(this.clientGateway).createClient(req.body);
+      const client = await this.clientUseCase.createClient(req.body);
 
       res.status(201).json({
         success: true,
@@ -31,7 +33,7 @@ export class ClientController {
 
   public update = async (req, res) => {
     try {
-      const response = await this.clientGateway.update(parseInt(req.params.id), req.body);
+      const response = await this.clientUseCase.updateClient(parseInt(req.params.id), req.body);
 
       res.status(200).json({
         success: true,
@@ -50,14 +52,14 @@ export class ClientController {
       const clientId = req.params.id;
 
       if (clientId) {
-        const response = await this.clientGateway.findById(clientId);
+        const response = await this.clientUseCase.findClientById(clientId);
         return res.status(200).json({
           success: true,
           data: response
         });
       }
 
-      const response = await this.clientGateway.findAll();
+      const response = await this.clientUseCase.findAllClients();
 
       return res.status(200).json({
         success: true,
@@ -74,7 +76,7 @@ export class ClientController {
   public delete = async (req, res) => {
     try {
       const clientId = req.params.id;
-      await this.clientGateway.delete(clientId);
+      await this.clientUseCase.deleteClient(clientId);
 
       res.status(200).json({
         success: true,
