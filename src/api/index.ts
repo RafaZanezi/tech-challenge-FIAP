@@ -1,6 +1,9 @@
 import express from 'express';
 import { DatabaseConnection } from "../interfaces/connection";
 import { ClientAPI } from './client';
+import { ServiceAPI } from './service';
+import { SupplyAPI } from './supply';
+import { VehicleAPI } from './vehicle';
 export class WorkshopApp {
 
 	private _dbConnection: DatabaseConnection;
@@ -13,6 +16,9 @@ export class WorkshopApp {
 		const app = express();
 
 		const clientRoutes = new ClientAPI(this._dbConnection);
+		const serviceRoutes = new ServiceAPI(this._dbConnection);
+		const supplyRoutes = new SupplyAPI(this._dbConnection);
+		const vehicleRoutes = new VehicleAPI(this._dbConnection);
 
 		app.use(express.json());
 		app.use(express.urlencoded({ extended: true }));
@@ -24,11 +30,9 @@ export class WorkshopApp {
 		// app.use('/auth', routerAuth);
 
 		app.use('/api', clientRoutes.getRoutes());
-		// app.use('/api', routerClients);
-		// app.use('/api', routerServices);
-		// app.use('/api', routerVehicles);
-		// app.use('/api', routerSupplies);
-
+		app.use('/api', serviceRoutes.getRoutes());
+		app.use('/api', supplyRoutes.getRoutes());
+		app.use('/api', vehicleRoutes.getRoutes());
 		// app.use('/api', routerServiceOrders);
 
 		const port = process.env.PORT || 3000;

@@ -1,4 +1,4 @@
-import { Entity } from '../1.old/shared/domain/entities/entity';
+import { Entity } from './entity';
 import { ValidationError } from '../usecases/errors/errors';
 
 export interface SupplyProps {

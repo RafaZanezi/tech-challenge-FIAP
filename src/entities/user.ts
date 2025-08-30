@@ -1,5 +1,5 @@
-import { Entity } from '../1.old/shared/domain/entities/entity';
-import { UserRole } from '../1.old/shared/domain/enums/user-role.enum';
+import { Entity } from './entity';
+import { UserRole } from '../interfaces/enums/user-role.enum';
 import { ValidationError } from '../usecases/errors/errors';
 
 export interface UserProps {

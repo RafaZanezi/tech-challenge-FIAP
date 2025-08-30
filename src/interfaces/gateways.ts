@@ -3,6 +3,7 @@ import { Service } from "../entities/service";
 import { ServiceOrder } from "../entities/service-order";
 import { Supply } from "../entities/supply";
 import { User } from "../entities/user-new";
+import { Vehicle } from "../entities/vehicle";
 
 interface AuthGatewayInterface {
     registerUser(name: string, password: string, role: string): Promise<User>;
@@ -45,10 +46,21 @@ interface SupplyGatewayInterface {
     delete(id: number): Promise<void>
 }
 
+interface VehicleGatewayInterface {
+    findAll(): Promise<Vehicle[]>;
+    findById(id: number): Promise<Vehicle | null>;
+    findByLicensePlate(licensePlate: string): Promise<Vehicle | null>;
+    findByClientId(clientId: number): Promise<Vehicle[]>;
+    insert(entity: Vehicle): Promise<Vehicle>;
+    update(id: number, entity: Partial<Vehicle>): Promise<Vehicle>;
+    delete(id: number): Promise<void>;
+}
+
 export {
     AuthGatewayInterface,
     ClientGatewayInterface,
     ServiceGatewayInterface,
     ServiceOrderGatewayInterface,
-    SupplyGatewayInterface
+    SupplyGatewayInterface,
+    VehicleGatewayInterface
 }
