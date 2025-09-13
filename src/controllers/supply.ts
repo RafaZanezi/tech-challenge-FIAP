@@ -1,6 +1,9 @@
+import { Supply } from "../entities/supply";
 import { SupplyGateway } from "../gateways/supply";
 import { DatabaseConnection } from "../interfaces/connection";
 import { SupplyGatewayInterface } from "../interfaces/gateways";
+import { SupplyCreatedPresenter } from "../presenters/supply";
+import { verifyAndReturnError } from "../shared/controller-presenter-error";
 import { SupplyUseCases } from "../usecases/supply";
 
 export class SupplyController {
@@ -17,17 +20,20 @@ export class SupplyController {
 
   public create = async (req, res) => {
     try {
-      const supply = await this.supplyUseCase.createSupply(req.body);
+      const supply = new Supply({
+        name: req.body.name,
+        quantity: req.body.quantity,
+        price: req.body.price
+      });
 
-      res.status(201).json({
-        success: true,
-        data: supply
-      });
+      const newSupply = await this.supplyUseCase.createSupply(supply);
+
+      const presenter = new SupplyCreatedPresenter();
+      presenter.present(newSupply);
+
+      res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
-      res.status(error?.statusCode ?? 500).json({
-        success: false,
-        message: error?.message ?? 'Ocorreu um erro ao processar'
-      });
+      verifyAndReturnError(error, res);
     }
   }
 
@@ -35,41 +41,35 @@ export class SupplyController {
     try {
       const response = await this.supplyUseCase.updateSupply(parseInt(req.params.id), req.body);
 
-      res.status(200).json({
-        success: true,
-        data: response
-      });
+      const presenter = new SupplyCreatedPresenter();
+      presenter.present(response);
+
+      res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
-      res.status(error?.statusCode ?? 500).json({
-        success: false,
-        message: error?.message ?? 'Ocorreu um erro ao processar'
-      });
+      verifyAndReturnError(error, res);
     }
   }
 
   public find = async (req, res) => {
     try {
       const supplyId = req.params.id;
+      const presenter = new SupplyCreatedPresenter();
 
       if (supplyId) {
         const response = await this.supplyUseCase.findSupplyById(supplyId);
-        return res.status(200).json({
-          success: true,
-          data: response
-        });
+
+        presenter.present(response);
+        res.status(presenter.getStatusCode()).send(presenter.getResponse());
+
+        return;
       }
 
       const response = await this.supplyUseCase.findAllSupplies();
 
-      return res.status(200).json({
-        success: true,
-        data: response
-      });
+      presenter.presentList(response);
+      res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
-      res.status(error?.statusCode ?? 500).json({
-        success: false,
-        message: error?.message ?? 'Ocorreu um erro ao processar'
-      });
+      verifyAndReturnError(error, res);
     }
   }
 
@@ -78,15 +78,12 @@ export class SupplyController {
       const supplyId = req.params.id;
       await this.supplyUseCase.deleteSupply(supplyId);
 
-      res.status(200).json({
-        success: true,
-        message: 'Insumo deletado com sucesso'
-      });
+      const presenter = new SupplyCreatedPresenter();
+      presenter.present({ id: parseInt(supplyId) } as Supply);
+
+      res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
-      res.status(error?.statusCode ?? 500).json({
-        success: false,
-        message: error?.message ?? 'Ocorreu um erro ao processar'
-      });
+      verifyAndReturnError(error, res);
     }
   }
 }

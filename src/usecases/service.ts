@@ -6,36 +6,43 @@ import { ConflictError } from "./errors/errors";
 export class ServiceUseCases {
   constructor(private serviceGateway: ServiceGatewayInterface) { }
 
-  async createService(data: Service): Promise<Service> {
-    const existingService = await this.serviceGateway.findByName(data.name);
+  async createService(service: Service): Promise<Service> {
+    const existingService = await this.serviceGateway.findByName(service.name);
 
     if (existingService) {
       throw new ConflictError('Serviço com este nome já existe');
     }
 
-    const service = new Service({
-      name: data.name,
-      description: data.description,
-      price: data.price
-    });
+    const savedServiceDTO = await this.serviceGateway.insert(service);
 
-    const savedService = await this.serviceGateway.insert(service);
-
-    return savedService;
+    return new Service({
+      name: savedServiceDTO.name,
+      description: savedServiceDTO.description,
+      price: savedServiceDTO.price
+    }, savedServiceDTO.id);
   }
 
   async findServiceById(id: number): Promise<Service | null> {
-    const service = await this.serviceGateway.findById(id);
+    const serviceDTO = await this.serviceGateway.findById(id);
 
-    if (!service) {
-      throw new Error(`Serviço com id ${id} não encontrado`);
+    if (!serviceDTO) {
+      throw new NotFoundHttpError('Serviço');
     }
 
-    return service;
+    return new Service({
+      name: serviceDTO.name,
+      description: serviceDTO.description,
+      price: serviceDTO.price
+    }, serviceDTO.id);
   }
 
   async findAllServices(): Promise<Service[]> {
-    return await this.serviceGateway.findAll();
+    const servicesDTO = await this.serviceGateway.findAll();
+    return servicesDTO.map(serviceDTO => new Service({
+      name: serviceDTO.name,
+      description: serviceDTO.description,
+      price: serviceDTO.price
+    }, serviceDTO.id));
   }
 
   async updateService(id: number, data: Service): Promise<Service> {
@@ -55,13 +62,17 @@ export class ServiceUseCases {
       }
     }
 
-    const updatedService = await this.serviceGateway.update(id, {
-      name: name ?? service.name,
-      description: description ?? service.description,
-      price: price ?? service.price
+    const updatedServiceDTO = await this.serviceGateway.update(id, { 
+      name, 
+      description: description ?? service.description, 
+      price: price ?? service.price 
     });
 
-    return updatedService;
+    return new Service({
+      name: updatedServiceDTO.name,
+      description: updatedServiceDTO.description,
+      price: updatedServiceDTO.price
+    }, updatedServiceDTO.id);
   }
 
   async deleteService(id: number): Promise<void> {
@@ -71,6 +82,6 @@ export class ServiceUseCases {
       throw new NotFoundHttpError('Serviço');
     }
 
-    return this.serviceGateway.delete(id);
+   await this.serviceGateway.delete(id);
   }
 }

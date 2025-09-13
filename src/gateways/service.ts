@@ -1,3 +1,4 @@
+import { ServiceDTO } from "../dtos/service";
 import { Service } from "../entities/service";
 import { PostgresConnection } from "../external/postgres/database-queries";
 import { DatabaseConnection } from "../interfaces/connection";
@@ -12,24 +13,24 @@ export class ServiceGateway implements ServiceGatewayInterface {
         this.queries = new PostgresConnection(database);
     }
 
-    findAll(): Promise<Service[]> {
-        return this.queries.findAll<Service[]>(this.tableName, null);
+    findAll(): Promise<ServiceDTO[]> {
+        return this.queries.findAll<ServiceDTO[]>(this.tableName, null);
     }
 
-    findById(id: number): Promise<Service | null> {
-        return this.queries.findByParams<Service>(this.tableName, null, { id });
+    findById(id: number): Promise<ServiceDTO | null> {
+        return this.queries.findByParams<ServiceDTO>(this.tableName, null, { id });
     }
 
-    findByName(name: string): Promise<Service | null> {
-        return this.queries.findByParams<Service>(this.tableName, null, { name });
+    findByName(name: string): Promise<ServiceDTO | null> {
+        return this.queries.findByParams<ServiceDTO>(this.tableName, null, { name });
     }
 
-    insert(entity: Service): Promise<Service> {
-        return this.queries.insert<Service>(this.tableName, entity);
+    insert(entity: Service): Promise<ServiceDTO> {
+        return this.queries.insert<ServiceDTO>(this.tableName, entity);
     }
 
-    update(id: number, entity: Partial<Service>): Promise<Service> {
-        return this.queries.update<Service>(this.tableName, id, entity);
+    update(id: number, entity: Partial<Service>): Promise<ServiceDTO> {
+        return this.queries.update<ServiceDTO>(this.tableName, id, entity);
     }
 
     delete(id: number): Promise<void> {

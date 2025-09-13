@@ -1,3 +1,4 @@
+import { SupplyDTO } from "../dtos/supply";
 import { Supply } from "../entities/supply";
 import { PostgresConnection } from "../external/postgres/database-queries";
 import { DatabaseConnection } from "../interfaces/connection";
@@ -12,24 +13,24 @@ export class SupplyGateway implements SupplyGatewayInterface {
         this.queries = new PostgresConnection(database);
     }
 
-    findAll(): Promise<Supply[]> {
-        return this.queries.findAll<Supply[]>(this.tableName, null);
+    findAll(): Promise<SupplyDTO[]> {
+        return this.queries.findAll<SupplyDTO[]>(this.tableName, null);
     }
 
-    findById(id: number): Promise<Supply | null> {
-        return this.queries.findByParams<Supply>(this.tableName, null, { id });
+    findById(id: number): Promise<SupplyDTO | null> {
+        return this.queries.findByParams<SupplyDTO>(this.tableName, null, { id });
     }
 
-    findByName(name: string): Promise<Supply | null> {
-        return this.queries.findByParams<Supply>(this.tableName, null, { name });
+    findByName(name: string): Promise<SupplyDTO | null> {
+        return this.queries.findByParams<SupplyDTO>(this.tableName, null, { name });
     }
 
-    insert(entity: Supply): Promise<Supply> {
-        return this.queries.insert<Supply>(this.tableName, entity);
+    insert(entity: Supply): Promise<SupplyDTO> {
+        return this.queries.insert<SupplyDTO>(this.tableName, entity);
     }
 
-    update(id: number, entity: Partial<Supply>): Promise<Supply> {
-        return this.queries.update<Supply>(this.tableName, id, entity);
+    update(id: number, entity: Partial<Supply>): Promise<SupplyDTO> {
+        return this.queries.update<SupplyDTO>(this.tableName, id, entity);
     }
 
     delete(id: number): Promise<void> {

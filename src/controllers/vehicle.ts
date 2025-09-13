@@ -95,7 +95,7 @@ export class VehicleController {
       await this.vehicleUseCase.deleteVehicle(vehicleId);
 
       const presenter = new VehicleCreatedPresenter();
-      presenter.present({ id: vehicleId } as any);
+      presenter.present({ id: parseInt(vehicleId) } as Vehicle);
 
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {

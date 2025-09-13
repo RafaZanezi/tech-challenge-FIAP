@@ -6,36 +6,43 @@ import { ConflictError } from "./errors/errors";
 export class SupplyUseCases {
   constructor(private supplyGateway: SupplyGatewayInterface) { }
 
-  async createSupply(data: Supply): Promise<Supply> {
-    const existingSupply = await this.supplyGateway.findByName(data.name);
+  async createSupply(supply: Supply): Promise<Supply> {
+    const existingSupply = await this.supplyGateway.findByName(supply.name);
 
     if (existingSupply) {
       throw new ConflictError('Insumo com este nome já existe');
     }
 
-    const supply = new Supply({
-      name: data.name,
-      quantity: data.quantity,
-      price: data.price
-    });
+    const savedSupplyDTO = await this.supplyGateway.insert(supply);
 
-    const savedSupply = await this.supplyGateway.insert(supply);
-
-    return savedSupply;
+    return new Supply({
+      name: savedSupplyDTO.name,
+      quantity: savedSupplyDTO.quantity,
+      price: savedSupplyDTO.price
+    }, savedSupplyDTO.id);
   }
 
   async findSupplyById(id: number): Promise<Supply | null> {
-    const supply = await this.supplyGateway.findById(id);
+    const supplyDTO = await this.supplyGateway.findById(id);
 
-    if (!supply) {
-      throw new Error(`Insumo com id ${id} não encontrado`);
+    if (!supplyDTO) {
+      throw new NotFoundHttpError('Insumo');
     }
 
-    return supply;
+    return new Supply({
+      name: supplyDTO.name,
+      quantity: supplyDTO.quantity,
+      price: supplyDTO.price
+    }, supplyDTO.id);
   }
 
   async findAllSupplies(): Promise<Supply[]> {
-    return await this.supplyGateway.findAll();
+    const suppliesDTO = await this.supplyGateway.findAll();
+    return suppliesDTO.map(supplyDTO => new Supply({
+      name: supplyDTO.name,
+      quantity: supplyDTO.quantity,
+      price: supplyDTO.price
+    }, supplyDTO.id));
   }
 
   async updateSupply(id: number, data: Supply): Promise<Supply> {
@@ -55,13 +62,17 @@ export class SupplyUseCases {
       }
     }
 
-    const updatedSupply = await this.supplyGateway.update(id, {
+    const updatedSupplyDTO = await this.supplyGateway.update(id, {
       name: name ?? supply.name,
       quantity: quantity ?? supply.quantity,
       price: price ?? supply.price
     });
 
-    return updatedSupply;
+    return new Supply({
+      name: updatedSupplyDTO.name,
+      quantity: updatedSupplyDTO.quantity,
+      price: updatedSupplyDTO.price
+    }, updatedSupplyDTO.id);
   }
 
   async deleteSupply(id: number): Promise<void> {
@@ -71,6 +82,6 @@ export class SupplyUseCases {
       throw new NotFoundHttpError('Insumo');
     }
 
-    return this.supplyGateway.delete(id);
+   await this.supplyGateway.delete(id);
   }
 }

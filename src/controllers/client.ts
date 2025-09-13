@@ -79,7 +79,7 @@ export class ClientController {
       await this.clientUseCase.deleteClient(clientId);
 
       const presenter = new ClientCreatedPresenter();
-      presenter.present({ id: clientId } as ClientDTO);
+      presenter.present({ id: parseInt(clientId) } as Client);
 
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
