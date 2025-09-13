@@ -1,6 +1,9 @@
+import { Vehicle } from "../entities/vehicle";
 import { VehicleGateway } from "../gateways/vehicle";
 import { DatabaseConnection } from "../interfaces/connection";
 import { VehicleGatewayInterface } from "../interfaces/gateways";
+import { VehicleCreatedPresenter } from "../presenters/vehicle";
+import { verifyAndReturnError } from "../shared/controller-presenter-error";
 import { VehicleUseCases } from "../usecases/vehicle";
 
 export class VehicleController {
@@ -17,17 +20,22 @@ export class VehicleController {
 
   public create = async (req, res) => {
     try {
-      const vehicle = await this.vehicleUseCase.createVehicle(req.body);
+      const vehicle = new Vehicle({
+        brand: req.body.brand,
+        model: req.body.model,
+        year: req.body.year,
+        licensePlate: req.body.licensePlate,
+        clientId: req.body.clientId
+      });
 
-      res.status(201).json({
-        success: true,
-        data: vehicle
-      });
+      const newVehicle = await this.vehicleUseCase.createVehicle(vehicle);
+
+      const presenter = new VehicleCreatedPresenter();
+      presenter.present(newVehicle);
+
+      res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
-      res.status(error?.statusCode ?? 500).json({
-        success: false,
-        message: error?.message ?? 'Ocorreu um erro ao processar'
-      });
+      verifyAndReturnError(error, res);
     }
   }
 
@@ -35,41 +43,35 @@ export class VehicleController {
     try {
       const response = await this.vehicleUseCase.updateVehicle(parseInt(req.params.id), req.body);
 
-      res.status(200).json({
-        success: true,
-        data: response
-      });
+      const presenter = new VehicleCreatedPresenter();
+      presenter.present(response);
+
+      res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
-      res.status(error?.statusCode ?? 500).json({
-        success: false,
-        message: error?.message ?? 'Ocorreu um erro ao processar'
-      });
+      verifyAndReturnError(error, res);
     }
   }
 
   public find = async (req, res) => {
     try {
       const vehicleId = req.params.id;
+      const presenter = new VehicleCreatedPresenter();
 
       if (vehicleId) {
         const response = await this.vehicleUseCase.findVehicleById(vehicleId);
-        return res.status(200).json({
-          success: true,
-          data: response
-        });
+
+        presenter.present(response);
+        res.status(presenter.getStatusCode()).send(presenter.getResponse());
+
+        return;
       }
 
       const response = await this.vehicleUseCase.findAllVehicles();
 
-      return res.status(200).json({
-        success: true,
-        data: response
-      });
+      presenter.presentList(response);
+      res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
-      res.status(error?.statusCode ?? 500).json({
-        success: false,
-        message: error?.message ?? 'Ocorreu um erro ao processar'
-      });
+      verifyAndReturnError(error, res);
     }
   }
 
@@ -78,15 +80,12 @@ export class VehicleController {
       const clientId = parseInt(req.params.clientId);
       const response = await this.vehicleUseCase.findVehiclesByClientId(clientId);
 
-      return res.status(200).json({
-        success: true,
-        data: response
-      });
+      const presenter = new VehicleCreatedPresenter();
+      presenter.presentList(response);
+
+      res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
-      res.status(error?.statusCode ?? 500).json({
-        success: false,
-        message: error?.message ?? 'Ocorreu um erro ao processar'
-      });
+      verifyAndReturnError(error, res);
     }
   }
 
@@ -95,15 +94,12 @@ export class VehicleController {
       const vehicleId = req.params.id;
       await this.vehicleUseCase.deleteVehicle(vehicleId);
 
-      res.status(200).json({
-        success: true,
-        message: 'Veículo deletado com sucesso'
-      });
+      const presenter = new VehicleCreatedPresenter();
+      presenter.present({ id: vehicleId } as any);
+
+      res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
-      res.status(error?.statusCode ?? 500).json({
-        success: false,
-        message: error?.message ?? 'Ocorreu um erro ao processar'
-      });
+      verifyAndReturnError(error, res);
     }
   }
 }

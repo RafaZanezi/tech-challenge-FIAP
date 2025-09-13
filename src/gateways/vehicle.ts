@@ -1,3 +1,4 @@
+import { VehicleDTO } from "../dtos/vehicle";
 import { Vehicle } from "../entities/vehicle";
 import { PostgresConnection } from "../external/postgres/database-queries";
 import { DatabaseConnection } from "../interfaces/connection";
@@ -12,23 +13,23 @@ export class VehicleGateway implements VehicleGatewayInterface {
         this.queries = new PostgresConnection(database);
     }
 
-    findAll(): Promise<Vehicle[]> {
-        return this.queries.findAll<Vehicle[]>(this.tableName, null);
+    findAll(): Promise<VehicleDTO[]> {
+        return this.queries.findAll<VehicleDTO[]>(this.tableName, null);
     }
 
-    findById(id: number): Promise<Vehicle | null> {
-        return this.queries.findByParams<Vehicle>(this.tableName, null, { id });
+    findById(id: number): Promise<VehicleDTO | null> {
+        return this.queries.findByParams<VehicleDTO>(this.tableName, null, { id });
     }
 
-    findByLicensePlate(licensePlate: string): Promise<Vehicle | null> {
-        return this.queries.findByParams<Vehicle>(this.tableName, null, { license_plate: licensePlate });
+    findByLicensePlate(licensePlate: string): Promise<VehicleDTO | null> {
+        return this.queries.findByParams<VehicleDTO>(this.tableName, null, { license_plate: licensePlate });
     }
 
-    findByClientId(clientId: number): Promise<Vehicle[]> {
-        return this.queries.findAllByParams<Vehicle>(this.tableName, null, { client_id: clientId });
+    findByClientId(clientId: number): Promise<VehicleDTO[]> {
+        return this.queries.findAllByParams<VehicleDTO>(this.tableName, null, { client_id: clientId });
     }
 
-    insert(entity: Vehicle): Promise<Vehicle> {
+    insert(entity: Vehicle): Promise<VehicleDTO> {
         // Mapear camelCase para snake_case para o banco de dados
         const dbData = {
             brand: entity.brand,
@@ -41,7 +42,7 @@ export class VehicleGateway implements VehicleGatewayInterface {
         return this.queries.insert(this.tableName, { props: dbData } as any);
     }
 
-    update(id: number, entity: Partial<Vehicle>): Promise<Vehicle> {
+    update(id: number, entity: Partial<Vehicle>): Promise<VehicleDTO> {
         // Mapear camelCase para snake_case para o banco de dados
         const dbData: Record<string, any> = {};
         
@@ -51,7 +52,7 @@ export class VehicleGateway implements VehicleGatewayInterface {
         if (entity.licensePlate !== undefined) dbData.license_plate = entity.licensePlate;
         if (entity.clientId !== undefined) dbData.client_id = entity.clientId;
         
-        return this.queries.update<Vehicle>(this.tableName, id, dbData);
+        return this.queries.update<VehicleDTO>(this.tableName, id, dbData);
     }
 
     delete(id: number): Promise<void> {

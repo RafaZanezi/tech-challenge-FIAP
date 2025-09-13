@@ -21,27 +21,53 @@ export class VehicleUseCases {
       clientId: data.clientId
     });
 
-    const savedVehicle = await this.vehicleGateway.insert(vehicle);
+    const savedVehicleDTO = await this.vehicleGateway.insert(vehicle);
 
-    return savedVehicle;
+    return new Vehicle({
+      brand: savedVehicleDTO.brand,
+      model: savedVehicleDTO.model,
+      year: savedVehicleDTO.year,
+      licensePlate: savedVehicleDTO.licensePlate,
+      clientId: savedVehicleDTO.clientId
+    }, savedVehicleDTO.id);
   }
 
   async findVehicleById(id: number): Promise<Vehicle | null> {
-    const vehicle = await this.vehicleGateway.findById(id);
+    const vehicleDTO = await this.vehicleGateway.findById(id);
 
-    if (!vehicle) {
-      throw new Error(`Veículo com id ${id} não encontrado`);
+    if (!vehicleDTO) {
+      throw new NotFoundHttpError(`Veículo`);
     }
 
-    return vehicle;
+    return new Vehicle({
+      brand: vehicleDTO.brand,
+      model: vehicleDTO.model,
+      year: vehicleDTO.year,
+      licensePlate: vehicleDTO.licensePlate,
+      clientId: vehicleDTO.clientId
+    }, vehicleDTO.id);
   }
 
   async findAllVehicles(): Promise<Vehicle[]> {
-    return await this.vehicleGateway.findAll();
+    const vehiclesDTO = await this.vehicleGateway.findAll();
+    return vehiclesDTO.map(vehicleDTO => new Vehicle({
+      brand: vehicleDTO.brand,
+      model: vehicleDTO.model,
+      year: vehicleDTO.year,
+      licensePlate: vehicleDTO.licensePlate,
+      clientId: vehicleDTO.clientId
+    }, vehicleDTO.id));
   }
 
   async findVehiclesByClientId(clientId: number): Promise<Vehicle[]> {
-    return await this.vehicleGateway.findByClientId(clientId);
+    const vehiclesDTO = await this.vehicleGateway.findByClientId(clientId);
+    return vehiclesDTO.map(vehicleDTO => new Vehicle({
+      brand: vehicleDTO.brand,
+      model: vehicleDTO.model,
+      year: vehicleDTO.year,
+      licensePlate: vehicleDTO.licensePlate,
+      clientId: vehicleDTO.clientId
+    }, vehicleDTO.id));
   }
 
   async updateVehicle(id: number, data: Vehicle): Promise<Vehicle> {
@@ -61,7 +87,7 @@ export class VehicleUseCases {
       }
     }
 
-    const updatedVehicle = await this.vehicleGateway.update(id, {
+    const updatedVehicleDTO = await this.vehicleGateway.update(id, {
       brand: brand ?? vehicle.brand,
       model: model ?? vehicle.model,
       year: year ?? vehicle.year,
@@ -69,7 +95,13 @@ export class VehicleUseCases {
       clientId: clientId ?? vehicle.clientId
     });
 
-    return updatedVehicle;
+    return new Vehicle({
+      brand: updatedVehicleDTO.brand,
+      model: updatedVehicleDTO.model,
+      year: updatedVehicleDTO.year,
+      licensePlate: updatedVehicleDTO.licensePlate,
+      clientId: updatedVehicleDTO.clientId
+    }, updatedVehicleDTO.id);
   }
 
   async deleteVehicle(id: number): Promise<void> {

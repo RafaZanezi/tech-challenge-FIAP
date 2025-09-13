@@ -1,12 +1,11 @@
+import { ClientDTO } from "../dtos/client";
 import { Client } from "../entities/client";
 import { ClientGateway } from "../gateways/client";
 import { DatabaseConnection } from "../interfaces/connection";
 import { ClientGatewayInterface } from "../interfaces/gateways";
 import { ClientCreatedPresenter } from "../presenters/client";
-import { ErrorPresenter } from "../presenters/error";
-import { ValidationErrorPresenter } from "../presenters/validation";
+import { verifyAndReturnError } from "../shared/controller-presenter-error";
 import { ClientUseCases } from "../usecases/client";
-import { ValidationError } from "../usecases/errors/errors";
 
 export class ClientController {
 
@@ -34,16 +33,7 @@ export class ClientController {
 
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
-      let presenter;
-
-      if (error instanceof ValidationError) {
-        presenter = new ValidationErrorPresenter();
-      } else {
-        presenter = new ErrorPresenter();
-      }
-
-      presenter.present(error);
-      res.status(presenter.getStatusCode()).send(presenter.getResponse());
+      verifyAndReturnError(error, res);
     }
   }
 
@@ -56,16 +46,7 @@ export class ClientController {
 
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
-      let presenter;
-
-      if (error instanceof ValidationError) {
-        presenter = new ValidationErrorPresenter();
-      } else {
-        presenter = new ErrorPresenter();
-      }
-
-      presenter.present(error);
-      res.status(presenter.getStatusCode()).send(presenter.getResponse());
+      verifyAndReturnError(error, res);
     }
   }
 
@@ -79,23 +60,16 @@ export class ClientController {
 
         presenter.present(response);
         res.status(presenter.getStatusCode()).send(presenter.getResponse());
+
+        return;
       }
 
       const response = await this.clientUseCase.findAllClients();
 
-      presenter.present(response);
+      presenter.presentList(response);
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
-      let presenter;
-
-      if (error instanceof ValidationError) {
-        presenter = new ValidationErrorPresenter();
-      } else {
-        presenter = new ErrorPresenter();
-      }
-
-      presenter.present(error);
-      res.status(presenter.getStatusCode()).send(presenter.getResponse());
+      verifyAndReturnError(error, res);
     }
   }
 
@@ -105,20 +79,11 @@ export class ClientController {
       await this.clientUseCase.deleteClient(clientId);
 
       const presenter = new ClientCreatedPresenter();
-      presenter.present({ id: clientId });
+      presenter.present({ id: clientId } as ClientDTO);
 
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
-      let presenter;
-
-      if (error instanceof ValidationError) {
-        presenter = new ValidationErrorPresenter();
-      } else {
-        presenter = new ErrorPresenter();
-      }
-
-      presenter.present(error);
-      res.status(presenter.getStatusCode()).send(presenter.getResponse());
+      verifyAndReturnError(error, res);
     }
   }
 }
