@@ -6,35 +6,40 @@ import { ConflictError } from "./errors/errors";
 export class ClientUseCases {
   constructor(private clientGateway: ClientGatewayInterface) { }
 
-  async createClient(data: Client): Promise<Client> {
-    const existingClient = await this.clientGateway.findByIdentifier(data.identifier);
+  async createClient(client: Client): Promise<Client> {
+    const existingClient = await this.clientGateway.findByIdentifier(client.identifier);
 
     if (existingClient) {
       throw new ConflictError('Cliente com este identificador já existe');
     }
 
-    const client = new Client({
-      name: data.name,
-      identifier: data.identifier
-    });
+    const savedClientDTO = await this.clientGateway.insert(client);
 
-    const savedClient = await this.clientGateway.insert(client);
-
-    return savedClient;
+    return new Client({
+      name: savedClientDTO.name,
+      identifier: savedClientDTO.identifier
+    }, savedClientDTO.id);
   }
 
   async findClientById(id: number): Promise<Client | null> {
-    const client = await this.clientGateway.findById(id);
+    const clientDTO = await this.clientGateway.findById(id);
 
-    if (!client) {
-      throw new Error(`Cliente com id ${id} não encontrado`);
+    if (!clientDTO) {
+      throw new NotFoundHttpError('Cliente');
     }
 
-    return client;
+    return new Client({
+      name: clientDTO.name,
+      identifier: clientDTO.identifier
+    }, clientDTO.id);
   }
 
   async findAllClients(): Promise<Client[]> {
-    return await this.clientGateway.findAll();
+    const clientsDTO = await this.clientGateway.findAll();
+    return clientsDTO.map(clientDTO => new Client({
+      name: clientDTO.name,
+      identifier: clientDTO.identifier
+    }, clientDTO.id));
   }
 
   async updateClient(id: number, data: Client): Promise<Client> {
@@ -54,9 +59,12 @@ export class ClientUseCases {
       }
     }
 
-    const updatedClient = await this.clientGateway.update(id, { name, identifier: identifier ?? client.identifier });
+    const updatedClientDTO = await this.clientGateway.update(id, { name, identifier: identifier ?? client.identifier });
 
-    return updatedClient;
+    return new Client({
+      name: updatedClientDTO.name,
+      identifier: updatedClientDTO.identifier
+    }, updatedClientDTO.id);
   }
 
   async deleteClient(id: number): Promise<void> {
@@ -66,6 +74,6 @@ export class ClientUseCases {
       throw new NotFoundHttpError('Cliente');
     }
 
-    return this.clientGateway.delete(id);
+   await this.clientGateway.delete(id);
   }
 }

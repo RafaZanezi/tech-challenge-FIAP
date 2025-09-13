@@ -1,3 +1,8 @@
+import { ClientDTO } from "../dtos/client";
+import { ServiceDTO } from "../dtos/service";
+import { ServiceOrderDTO } from "../dtos/service-order";
+import { SupplyDTO } from "../dtos/supply";
+import { VehicleDTO } from "../dtos/vehicle";
 import { Client } from "../entities/client";
 import { Service } from "../entities/service";
 import { ServiceOrder } from "../entities/service-order";
@@ -12,47 +17,48 @@ interface AuthGatewayInterface {
 }
 
 interface ClientGatewayInterface {
-    findAll(): Promise<Client[]>;
-    findById(id: number): Promise<Client | null>;
-    findByIdentifier(identifier: string): Promise<Client | null>;
-    insert(entity: Client): Promise<Client>;
-    update(id: number, entity: Partial<Client>): Promise<Client>;
+    findAll(): Promise<ClientDTO[]>;
+    findById(id: number): Promise<ClientDTO | null>;
+    findByIdentifier(identifier: string): Promise<ClientDTO | null>;
+    insert(entity: Client): Promise<ClientDTO>;
+    update(id: number, entity: Partial<Client>): Promise<ClientDTO>;
     delete(id: number): Promise<void>
 }
 
 interface ServiceGatewayInterface {
-    findAll(): Promise<Service[]>;
-    findById(id: number): Promise<Service | null>;
-    findByName(name: string): Promise<Service | null>
-    insert(entity: Service): Promise<Service>;
-    update(id: number, entity: Partial<Service>): Promise<Service>;
+    findAll(): Promise<ServiceDTO[]>;
+    findById(id: number): Promise<ServiceDTO | null>;
+    findByName(name: string): Promise<ServiceDTO | null>;
+    insert(entity: Service): Promise<ServiceDTO>;
+    update(id: number, entity: Partial<Service>): Promise<ServiceDTO>;
+    delete(id: number): Promise<void>;
+}
+
+interface SupplyGatewayInterface {
+    findAll(): Promise<SupplyDTO[]>;
+    findById(id: number): Promise<SupplyDTO | null>;
+    findByName(name: string): Promise<SupplyDTO | null>;
+    insert(entity: Supply): Promise<SupplyDTO>;
+    update(id: number, entity: Partial<Supply>): Promise<SupplyDTO>;
+    delete(id: number): Promise<void>;
+}
+
+interface VehicleGatewayInterface {
+    findAll(): Promise<VehicleDTO[]>;
+    findById(id: number): Promise<VehicleDTO | null>;
+    findByLicensePlate(licensePlate: string): Promise<VehicleDTO | null>;
+    findByClientId(clientId: number): Promise<VehicleDTO[]>;
+    insert(entity: Vehicle): Promise<VehicleDTO>;
+    update(id: number, entity: Partial<Vehicle>): Promise<VehicleDTO>;
     delete(id: number): Promise<void>;
 }
 
 interface ServiceOrderGatewayInterface {
-    findAll(): Promise<ServiceOrder[]>;
-    findById(id: number): Promise<ServiceOrder | null>;
-    findOpenOSByCarAndClient(carId: number, client: string): Promise<any>;
-    create(data: ServiceOrder): Promise<ServiceOrder>;
-    update(id: number, data: Partial<ServiceOrder>): Promise<ServiceOrder>;
-}
-
-interface SupplyGatewayInterface {
-    findAll(): Promise<Supply[]>;
-    findById(id: number): Promise<Supply | null>;
-    findByName(name: string): Promise<Supply | null>;
-    insert(entity: Supply): Promise<Supply>;
-    update(id: number, entity: Partial<Supply>): Promise<Supply>;
-    delete(id: number): Promise<void>
-}
-
-interface VehicleGatewayInterface {
-    findAll(): Promise<Vehicle[]>;
-    findById(id: number): Promise<Vehicle | null>;
-    findByLicensePlate(licensePlate: string): Promise<Vehicle | null>;
-    findByClientId(clientId: number): Promise<Vehicle[]>;
-    insert(entity: Vehicle): Promise<Vehicle>;
-    update(id: number, entity: Partial<Vehicle>): Promise<Vehicle>;
+    findAll(): Promise<ServiceOrderDTO[]>;
+    findById(id: number): Promise<ServiceOrderDTO | null>;
+    findOpenOSByCarAndClient(carId: number, clientId: number): Promise<ServiceOrderDTO | null>;
+    create(data: ServiceOrder): Promise<ServiceOrderDTO>;
+    update(id: number, data: Partial<ServiceOrder>): Promise<ServiceOrderDTO>;
     delete(id: number): Promise<void>;
 }
 
@@ -60,7 +66,7 @@ export {
     AuthGatewayInterface,
     ClientGatewayInterface,
     ServiceGatewayInterface,
-    ServiceOrderGatewayInterface,
     SupplyGatewayInterface,
-    VehicleGatewayInterface
+    VehicleGatewayInterface,
+    ServiceOrderGatewayInterface,
 }
