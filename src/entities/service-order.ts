@@ -10,7 +10,7 @@ export interface ServiceOrderProps {
     services: Service[];
     supplies: Supply[];
     createdAt: Date;
-    finalizedAt: Date;
+    finalizedAt: Date | null;
     status: ServiceOrderStatus;
     totalServicePrice: number;
 }
@@ -37,7 +37,7 @@ export class ServiceOrder extends Entity<number> {
         return this.props.createdAt;
     }
 
-    get finalizedAt(): Date {
+    get finalizedAt(): Date | null {
         return this.props.finalizedAt;
     }
 
@@ -65,7 +65,7 @@ export class ServiceOrder extends Entity<number> {
         this.props.status = ServiceOrderStatus.IN_DIAGNOSIS;
     }
 
-    public updateServices(services: Partial<Service[]>) {
+    public updateServices(services: Service[]) {
         if (this.props.status !== ServiceOrderStatus.IN_DIAGNOSIS) {
             throw new ValidationError('A ordem de serviço deve estar em diagnóstico para atualizar os serviços');
         }
@@ -73,7 +73,7 @@ export class ServiceOrder extends Entity<number> {
         this.props.services = services;
     }
 
-    public updateSupplies(supplies: Partial<Supply[]>) {
+    public updateSupplies(supplies: Supply[]) {
         if (this.props.status !== ServiceOrderStatus.IN_DIAGNOSIS) {
             throw new ValidationError('A ordem de serviço deve estar em diagnóstico para atualizar os suprimentos');
         }

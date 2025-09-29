@@ -1,7 +1,7 @@
 import { Supply } from '../entities/supply';
 import { BasePresenter } from './base-presenter';
 
-export class SupplyCreatedPresenter extends BasePresenter {
+export class SupplyPresenter extends BasePresenter {
   present(supply: Supply): void {
     this.statusCode = 201;
     const { id, name, quantity, price } = supply;
@@ -12,7 +12,7 @@ export class SupplyCreatedPresenter extends BasePresenter {
         id,
         name,
         quantity,
-        price
+        price: parseFloat(price.toString())
       }
     };
   }
@@ -27,9 +27,48 @@ export class SupplyCreatedPresenter extends BasePresenter {
           id: supply.id,
           name: supply.name,
           quantity: supply.quantity,
-          price: supply.price
+          price: parseFloat(supply.price.toString())
         };
       })
+    };
+  }
+
+  presentFound(supply: Supply): void {
+    this.statusCode = 200;
+    const { id, name, quantity, price } = supply;
+
+    this.response = {
+      success: true,
+      data: {
+        id,
+        name,
+        quantity,
+        price: parseFloat(price.toString())
+      }
+    };
+  }
+
+  presentUpdated(supply: Supply): void {
+    this.statusCode = 200;
+    const { id, name, quantity, price } = supply;
+
+    this.response = {
+      success: true,
+      data: {
+        id,
+        name,
+        quantity,
+        price: parseFloat(price.toString())
+      }
+    };
+  }
+
+  presentDeleted(supply: Supply): void {
+    this.statusCode = 200;
+
+    this.response = {
+      success: true,
+      message: `Insumo com ID ${supply.id} deletado com sucesso`
     };
   }
 }

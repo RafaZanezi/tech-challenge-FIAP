@@ -1,21 +1,24 @@
 import { Vehicle } from "../entities/vehicle";
 import { VehicleGateway } from "../gateways/vehicle";
+import { ClientGateway } from "../gateways/client";
 import { DatabaseConnection } from "../interfaces/connection";
-import { VehicleGatewayInterface } from "../interfaces/gateways";
-import { VehicleCreatedPresenter } from "../presenters/vehicle";
-import { verifyAndReturnError } from "../shared/controller-presenter-error";
+import { VehicleGatewayInterface, ClientGatewayInterface } from "../interfaces/gateways";
+import { VehiclePresenter } from "../presenters/vehicle";
+import { verifyAndReturnError } from "../presenters/verify-and-return-error";
 import { VehicleUseCases } from "../usecases/vehicle";
 
 export class VehicleController {
 
   private dbConnection: DatabaseConnection;
   private vehicleGateway: VehicleGatewayInterface;
+  private clientGateway: ClientGatewayInterface;
   private vehicleUseCase: VehicleUseCases;
 
   constructor(dbConnection: DatabaseConnection) {
     this.dbConnection = dbConnection;
     this.vehicleGateway = new VehicleGateway(this.dbConnection);
-    this.vehicleUseCase = new VehicleUseCases(this.vehicleGateway);
+    this.clientGateway = new ClientGateway(this.dbConnection);
+    this.vehicleUseCase = new VehicleUseCases(this.vehicleGateway, this.clientGateway);
   }
 
   public create = async (req, res) => {
@@ -30,7 +33,7 @@ export class VehicleController {
 
       const newVehicle = await this.vehicleUseCase.createVehicle(vehicle);
 
-      const presenter = new VehicleCreatedPresenter();
+      const presenter = new VehiclePresenter();
       presenter.present(newVehicle);
 
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
@@ -43,8 +46,8 @@ export class VehicleController {
     try {
       const response = await this.vehicleUseCase.updateVehicle(parseInt(req.params.id), req.body);
 
-      const presenter = new VehicleCreatedPresenter();
-      presenter.present(response);
+      const presenter = new VehiclePresenter();
+      presenter.presentUpdated(response);
 
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
@@ -55,12 +58,12 @@ export class VehicleController {
   public find = async (req, res) => {
     try {
       const vehicleId = req.params.id;
-      const presenter = new VehicleCreatedPresenter();
+      const presenter = new VehiclePresenter();
 
       if (vehicleId) {
         const response = await this.vehicleUseCase.findVehicleById(vehicleId);
 
-        presenter.present(response);
+        presenter.presentFound(response);
         res.status(presenter.getStatusCode()).send(presenter.getResponse());
 
         return;
@@ -80,7 +83,7 @@ export class VehicleController {
       const clientId = parseInt(req.params.clientId);
       const response = await this.vehicleUseCase.findVehiclesByClientId(clientId);
 
-      const presenter = new VehicleCreatedPresenter();
+      const presenter = new VehiclePresenter();
       presenter.presentList(response);
 
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
@@ -94,8 +97,8 @@ export class VehicleController {
       const vehicleId = req.params.id;
       await this.vehicleUseCase.deleteVehicle(vehicleId);
 
-      const presenter = new VehicleCreatedPresenter();
-      presenter.present({ id: parseInt(vehicleId) } as Vehicle);
+      const presenter = new VehiclePresenter();
+      presenter.presentDeleted({ id: parseInt(vehicleId) } as Vehicle);
 
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {

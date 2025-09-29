@@ -1,10 +1,9 @@
-import { ClientDTO } from "../dtos/client";
 import { Client } from "../entities/client";
 import { ClientGateway } from "../gateways/client";
 import { DatabaseConnection } from "../interfaces/connection";
 import { ClientGatewayInterface } from "../interfaces/gateways";
-import { ClientCreatedPresenter } from "../presenters/client";
-import { verifyAndReturnError } from "../shared/controller-presenter-error";
+import { ClientPresenter } from "../presenters/client";
+import { verifyAndReturnError } from "../presenters/verify-and-return-error";
 import { ClientUseCases } from "../usecases/client";
 
 export class ClientController {
@@ -28,7 +27,7 @@ export class ClientController {
 
       const newClient = await this.clientUseCase.createClient(client);
 
-      const presenter = new ClientCreatedPresenter();
+      const presenter = new ClientPresenter();
       presenter.present(newClient);
 
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
@@ -41,8 +40,8 @@ export class ClientController {
     try {
       const response = await this.clientUseCase.updateClient(parseInt(req.params.id), req.body);
 
-      const presenter = new ClientCreatedPresenter();
-      presenter.present(response);
+      const presenter = new ClientPresenter();
+      presenter.presentUpdated(response);
 
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
@@ -53,12 +52,12 @@ export class ClientController {
   public find = async (req, res) => {
     try {
       const clientId = req.params.id;
-      const presenter = new ClientCreatedPresenter();
+      const presenter = new ClientPresenter();
 
       if (clientId) {
         const response = await this.clientUseCase.findClientById(clientId);
 
-        presenter.present(response);
+        presenter.presentFound(response);
         res.status(presenter.getStatusCode()).send(presenter.getResponse());
 
         return;
@@ -78,8 +77,8 @@ export class ClientController {
       const clientId = req.params.id;
       await this.clientUseCase.deleteClient(clientId);
 
-      const presenter = new ClientCreatedPresenter();
-      presenter.present({ id: parseInt(clientId) } as Client);
+      const presenter = new ClientPresenter();
+      presenter.presentDeleted({ id: parseInt(clientId) } as Client);
 
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {

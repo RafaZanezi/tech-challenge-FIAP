@@ -13,23 +13,59 @@ export class VehicleGateway implements VehicleGatewayInterface {
         this.queries = new PostgresConnection(database);
     }
 
-    findAll(): Promise<VehicleDTO[]> {
-        return this.queries.findAll<VehicleDTO[]>(this.tableName, null);
+    async findAll(): Promise<VehicleDTO[]> {
+        const results = await this.queries.findAll<any[]>(this.tableName, null);
+        return results.map(result => ({
+            id: result.id,
+            brand: result.brand,
+            model: result.model,
+            year: result.year,
+            licensePlate: result.license_plate,
+            clientId: result.client_id
+        }));
     }
 
-    findById(id: number): Promise<VehicleDTO | null> {
-        return this.queries.findByParams<VehicleDTO>(this.tableName, null, { id });
+    async findById(id: number): Promise<VehicleDTO | null> {
+        const result = await this.queries.findByParams<any>(this.tableName, null, { id });
+        if (!result) return null;
+        
+        return {
+            id: result.id,
+            brand: result.brand,
+            model: result.model,
+            year: result.year,
+            licensePlate: result.license_plate,
+            clientId: result.client_id
+        };
     }
 
-    findByLicensePlate(licensePlate: string): Promise<VehicleDTO | null> {
-        return this.queries.findByParams<VehicleDTO>(this.tableName, null, { license_plate: licensePlate });
+    async findByLicensePlate(licensePlate: string): Promise<VehicleDTO | null> {
+        const result = await this.queries.findByParams<any>(this.tableName, null, { license_plate: licensePlate });
+        if (!result) return null;
+        
+        return {
+            id: result.id,
+            brand: result.brand,
+            model: result.model,
+            year: result.year,
+            licensePlate: result.license_plate,
+            clientId: result.client_id
+        };
     }
 
-    findByClientId(clientId: number): Promise<VehicleDTO[]> {
-        return this.queries.findAllByParams<VehicleDTO>(this.tableName, null, { client_id: clientId });
+    async findByClientId(clientId: number): Promise<VehicleDTO[]> {
+        const results = await this.queries.findAllByParams<any>(this.tableName, null, { client_id: clientId });
+        return results.map(result => ({
+            id: result.id,
+            brand: result.brand,
+            model: result.model,
+            year: result.year,
+            licensePlate: result.license_plate,
+            clientId: result.client_id
+        }));
     }
 
-    insert(entity: Vehicle): Promise<VehicleDTO> {
+    async insert(entity: Vehicle): Promise<VehicleDTO> {
         // Mapear camelCase para snake_case para o banco de dados
         const dbData = {
             brand: entity.brand,
@@ -39,10 +75,20 @@ export class VehicleGateway implements VehicleGatewayInterface {
             client_id: entity.clientId
         };
         
-        return this.queries.insert(this.tableName, { props: dbData } as any);
+        const result = await this.queries.insert(this.tableName, { props: dbData } as any);
+        
+        // Mapear snake_case de volta para camelCase
+        return {
+            id: result.id,
+            brand: result.brand,
+            model: result.model,
+            year: result.year,
+            licensePlate: result.license_plate,
+            clientId: result.client_id
+        };
     }
 
-    update(id: number, entity: Partial<Vehicle>): Promise<VehicleDTO> {
+    async update(id: number, entity: Partial<Vehicle>): Promise<VehicleDTO> {
         // Mapear camelCase para snake_case para o banco de dados
         const dbData: Record<string, any> = {};
         
@@ -52,7 +98,17 @@ export class VehicleGateway implements VehicleGatewayInterface {
         if (entity.licensePlate !== undefined) dbData.license_plate = entity.licensePlate;
         if (entity.clientId !== undefined) dbData.client_id = entity.clientId;
         
-        return this.queries.update<VehicleDTO>(this.tableName, id, dbData);
+        const result = await this.queries.update<any>(this.tableName, id, dbData);
+        
+        // Mapear snake_case de volta para camelCase
+        return {
+            id: result.id,
+            brand: result.brand,
+            model: result.model,
+            year: result.year,
+            licensePlate: result.license_plate,
+            clientId: result.client_id
+        };
     }
 
     delete(id: number): Promise<void> {

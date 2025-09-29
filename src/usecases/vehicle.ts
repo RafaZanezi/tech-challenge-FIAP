@@ -1,25 +1,26 @@
 import { NotFoundHttpError } from "../api/errors/http-errors";
 import { Vehicle } from "../entities/vehicle";
-import { VehicleGatewayInterface } from "../interfaces/gateways";
-import { ConflictError } from "./errors/errors";
+import { VehicleGatewayInterface, ClientGatewayInterface } from "../interfaces/gateways";
+import { ConflictError, ValidationError } from "./errors/errors";
 
 export class VehicleUseCases {
-  constructor(private vehicleGateway: VehicleGatewayInterface) { }
+  constructor(
+    private vehicleGateway: VehicleGatewayInterface, 
+    private clientGateway: ClientGatewayInterface
+  ) { }
 
-  async createVehicle(data: Vehicle): Promise<Vehicle> {
-    const existingVehicle = await this.vehicleGateway.findByLicensePlate(data.licensePlate);
+  async createVehicle(vehicle: Vehicle): Promise<Vehicle> {
+    const existingVehicle = await this.vehicleGateway.findByLicensePlate(vehicle.licensePlate);
 
     if (existingVehicle) {
       throw new ConflictError('Veículo com esta placa já existe');
     }
 
-    const vehicle = new Vehicle({
-      brand: data.brand,
-      model: data.model,
-      year: data.year,
-      licensePlate: data.licensePlate,
-      clientId: data.clientId
-    });
+    // Verificar se o cliente existe
+    const client = await this.clientGateway.findById(vehicle.clientId);
+    if (!client) {
+      throw new ValidationError('Cliente não encontrado');
+    }
 
     const savedVehicleDTO = await this.vehicleGateway.insert(vehicle);
 

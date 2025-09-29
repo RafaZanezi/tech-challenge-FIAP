@@ -2,8 +2,8 @@ import { Service } from "../entities/service";
 import { ServiceGateway } from "../gateways/service";
 import { DatabaseConnection } from "../interfaces/connection";
 import { ServiceGatewayInterface } from "../interfaces/gateways";
-import { ServiceCreatedPresenter } from "../presenters/service";
-import { verifyAndReturnError } from "../shared/controller-presenter-error";
+import { ServicePresenter } from "../presenters/service";
+import { verifyAndReturnError } from "../presenters/verify-and-return-error";
 import { ServiceUseCases } from "../usecases/service";
 
 export class ServiceController {
@@ -28,7 +28,7 @@ export class ServiceController {
 
       const newService = await this.serviceUseCase.createService(service);
 
-      const presenter = new ServiceCreatedPresenter();
+      const presenter = new ServicePresenter();
       presenter.present(newService);
 
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
@@ -41,8 +41,8 @@ export class ServiceController {
     try {
       const response = await this.serviceUseCase.updateService(parseInt(req.params.id), req.body);
 
-      const presenter = new ServiceCreatedPresenter();
-      presenter.present(response);
+      const presenter = new ServicePresenter();
+      presenter.presentUpdated(response);
 
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
@@ -53,12 +53,12 @@ export class ServiceController {
   public find = async (req, res) => {
     try {
       const serviceId = req.params.id;
-      const presenter = new ServiceCreatedPresenter();
+      const presenter = new ServicePresenter();
 
       if (serviceId) {
         const response = await this.serviceUseCase.findServiceById(serviceId);
 
-        presenter.present(response);
+        presenter.presentFound(response);
         res.status(presenter.getStatusCode()).send(presenter.getResponse());
 
         return;
@@ -78,8 +78,8 @@ export class ServiceController {
       const serviceId = req.params.id;
       await this.serviceUseCase.deleteService(serviceId);
 
-      const presenter = new ServiceCreatedPresenter();
-      presenter.present({ id: parseInt(serviceId) } as Service);
+      const presenter = new ServicePresenter();
+      presenter.presentDeleted({ id: parseInt(serviceId) } as Service);
 
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {

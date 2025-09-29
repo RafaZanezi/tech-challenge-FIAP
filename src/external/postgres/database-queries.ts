@@ -48,7 +48,7 @@ export class PostgresConnection {
        
         const result = await this.db.query(query, values);
 
-        return result.rows[0] as T;
+        return result[0] as T;
     }
 
     async update<T>(table: string, id: number, data: Partial<T>): Promise<T> {

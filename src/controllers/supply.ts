@@ -2,8 +2,8 @@ import { Supply } from "../entities/supply";
 import { SupplyGateway } from "../gateways/supply";
 import { DatabaseConnection } from "../interfaces/connection";
 import { SupplyGatewayInterface } from "../interfaces/gateways";
-import { SupplyCreatedPresenter } from "../presenters/supply";
-import { verifyAndReturnError } from "../shared/controller-presenter-error";
+import { SupplyPresenter } from "../presenters/supply";
+import { verifyAndReturnError } from "../presenters/verify-and-return-error";
 import { SupplyUseCases } from "../usecases/supply";
 
 export class SupplyController {
@@ -28,7 +28,7 @@ export class SupplyController {
 
       const newSupply = await this.supplyUseCase.createSupply(supply);
 
-      const presenter = new SupplyCreatedPresenter();
+      const presenter = new SupplyPresenter();
       presenter.present(newSupply);
 
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
@@ -41,8 +41,8 @@ export class SupplyController {
     try {
       const response = await this.supplyUseCase.updateSupply(parseInt(req.params.id), req.body);
 
-      const presenter = new SupplyCreatedPresenter();
-      presenter.present(response);
+      const presenter = new SupplyPresenter();
+      presenter.presentUpdated(response);
 
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
@@ -53,12 +53,12 @@ export class SupplyController {
   public find = async (req, res) => {
     try {
       const supplyId = req.params.id;
-      const presenter = new SupplyCreatedPresenter();
+      const presenter = new SupplyPresenter();
 
       if (supplyId) {
         const response = await this.supplyUseCase.findSupplyById(supplyId);
 
-        presenter.present(response);
+        presenter.presentFound(response);
         res.status(presenter.getStatusCode()).send(presenter.getResponse());
 
         return;
@@ -78,8 +78,8 @@ export class SupplyController {
       const supplyId = req.params.id;
       await this.supplyUseCase.deleteSupply(supplyId);
 
-      const presenter = new SupplyCreatedPresenter();
-      presenter.present({ id: parseInt(supplyId) } as Supply);
+      const presenter = new SupplyPresenter();
+      presenter.presentDeleted({ id: parseInt(supplyId) } as Supply);
 
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {

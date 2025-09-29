@@ -1,0 +1,388 @@
+import request from 'supertest';
+import express from 'express';
+import { TestDatabaseConnection, validCPF } from '../../test/setup/integration-test-setup';
+import { ClientAPI } from './client';
+import { VehicleAPI } from './vehicle';
+
+describe('Vehicle Integration Tests', () => {
+    let app: express.Application;
+    let testDb: TestDatabaseConnection;
+    let clientId: number;
+
+    beforeAll(async () => {
+        testDb = new TestDatabaseConnection();
+        await testDb.connect();
+        
+        app = express();
+        app.use(express.json());
+        app.use(express.urlencoded({ extended: true }));
+        
+        const clientAPI = new ClientAPI(testDb);
+        const vehicleAPI = new VehicleAPI(testDb);
+        app.use('/api', clientAPI.getRoutes());
+        app.use('/api', vehicleAPI.getRoutes());
+    });
+
+    beforeEach(async () => {
+        await testDb.cleanup();
+        
+        // Criar um cliente para os testes de veículos
+        const clientResponse = await request(app)
+            .post('/api/clients')
+            .send({
+                name: 'Cliente Teste',
+                identifier: validCPF
+            });
+        
+        clientId = clientResponse.body.data.id;
+    });
+
+    afterAll(async () => {
+        await testDb.disconnect();
+    });
+
+    describe('POST /api/vehicles', () => {
+        it('deve criar um veículo com dados válidos', async () => {
+            const vehicleData = {
+                brand: 'Toyota',
+                model: 'Corolla',
+                year: 2020,
+                licensePlate: 'ABC1234',
+                clientId: clientId
+            };
+
+            const response = await request(app)
+                .post('/api/vehicles')
+                .send(vehicleData)
+                .expect(201);
+
+            expect(response.body.success).toBe(true);
+            expect(response.body.data).toHaveProperty('id');
+            expect(response.body.data.brand).toBe(vehicleData.brand);
+            expect(response.body.data.model).toBe(vehicleData.model);
+            expect(response.body.data.year).toBe(vehicleData.year);
+            expect(response.body.data.licensePlate).toBe(vehicleData.licensePlate);
+            expect(response.body.data.clientId).toBe(vehicleData.clientId);
+        });
+
+        it('deve criar um veículo com placa no formato Mercosul', async () => {
+            const vehicleData = {
+                brand: 'Honda',
+                model: 'Civic',
+                year: 2022,
+                licensePlate: 'ABC1D23',
+                clientId: clientId
+            };
+
+            const response = await request(app)
+                .post('/api/vehicles')
+                .send(vehicleData)
+                .expect(201);
+
+            expect(response.body.success).toBe(true);
+            expect(response.body.data.licensePlate).toBe(vehicleData.licensePlate);
+        });
+
+        it('deve retornar erro ao tentar criar veículo com placa inválida', async () => {
+            const vehicleData = {
+                brand: 'Toyota',
+                model: 'Corolla',
+                year: 2020,
+                licensePlate: 'INVALID',
+                clientId: clientId
+            };
+
+            const response = await request(app)
+                .post('/api/vehicles')
+                .send(vehicleData)
+                .expect(400);
+
+            expect(response.body.success).toBe(false);
+            expect(response.body.message).toContain('Placa');
+        });
+
+        it('deve retornar erro ao tentar criar veículo com ano inválido', async () => {
+            const vehicleData = {
+                brand: 'Toyota',
+                model: 'Corolla',
+                year: 1800,
+                licensePlate: 'ABC1234',
+                clientId: clientId
+            };
+
+            const response = await request(app)
+                .post('/api/vehicles')
+                .send(vehicleData)
+                .expect(400);
+
+            expect(response.body.success).toBe(false);
+            expect(response.body.message).toContain('Ano');
+        });
+
+        it('deve retornar erro ao tentar criar veículo sem marca', async () => {
+            const vehicleData = {
+                brand: '',
+                model: 'Corolla',
+                year: 2020,
+                licensePlate: 'ABC1234',
+                clientId: clientId
+            };
+
+            const response = await request(app)
+                .post('/api/vehicles')
+                .send(vehicleData)
+                .expect(400);
+
+            expect(response.body.success).toBe(false);
+            expect(response.body.message).toContain('Marca');
+        });
+
+        it('deve retornar erro ao tentar criar veículo com clientId inválido', async () => {
+            const vehicleData = {
+                brand: 'Toyota',
+                model: 'Corolla',
+                year: 2020,
+                licensePlate: 'ABC1234',
+                clientId: 999999
+            };
+
+            const response = await request(app)
+                .post('/api/vehicles')
+                .send(vehicleData)
+                .expect(400);
+
+            expect(response.body.success).toBe(false);
+        });
+    });
+
+    describe('GET /api/vehicles', () => {
+        beforeEach(async () => {
+            // Criar alguns veículos para teste
+            await request(app)
+                .post('/api/vehicles')
+                .send({
+                    brand: 'Toyota',
+                    model: 'Corolla',
+                    year: 2020,
+                    licensePlate: 'ABC1234',
+                    clientId: clientId
+                });
+            
+            await request(app)
+                .post('/api/vehicles')
+                .send({
+                    brand: 'Honda',
+                    model: 'Civic',
+                    year: 2021,
+                    licensePlate: 'XYZ5678',
+                    clientId: clientId
+                });
+        });
+
+        it('deve retornar todos os veículos', async () => {
+            const response = await request(app)
+                .get('/api/vehicles')
+                .expect(200);
+
+            expect(response.body.success).toBe(true);
+            expect(Array.isArray(response.body.data)).toBe(true);
+            expect(response.body.data.length).toBeGreaterThanOrEqual(2);
+        });
+
+        it('deve retornar um veículo específico por ID', async () => {
+            // Primeiro criar um veículo
+            const createResponse = await request(app)
+                .post('/api/vehicles')
+                .send({
+                    brand: 'Ford',
+                    model: 'Focus',
+                    year: 2019,
+                    licensePlate: 'DEF9876',
+                    clientId: clientId
+                });
+
+            const vehicleId = createResponse.body.data.id;
+
+            const response = await request(app)
+                .get(`/api/vehicles/${vehicleId}`)
+                .expect(200);
+
+            expect(response.body.success).toBe(true);
+            expect(response.body.data.id).toBe(vehicleId);
+            expect(response.body.data.brand).toBe('Ford');
+            expect(response.body.data.model).toBe('Focus');
+        });
+
+        it('deve retornar veículos de um cliente específico', async () => {
+            const response = await request(app)
+                .get(`/api/vehicles/client/${clientId}`)
+                .expect(200);
+
+            expect(response.body.success).toBe(true);
+            expect(Array.isArray(response.body.data)).toBe(true);
+            
+            // Verificar se todos os veículos pertencem ao cliente
+            response.body.data.forEach(vehicle => {
+                expect(vehicle.clientId).toBe(clientId);
+            });
+        });
+
+        it('deve retornar erro ao buscar veículo inexistente', async () => {
+            const response = await request(app)
+                .get('/api/vehicles/999999')
+                .expect(404);
+
+            expect(response.body.success).toBe(false);
+        });
+    });
+
+    describe('PUT /api/vehicles/:id', () => {
+        let vehicleId: number;
+
+        beforeEach(async () => {
+            const createResponse = await request(app)
+                .post('/api/vehicles')
+                .send({
+                    brand: 'Original Brand',
+                    model: 'Original Model',
+                    year: 2020,
+                    licensePlate: 'ABC1234',
+                    clientId: clientId
+                });
+            
+            vehicleId = createResponse.body.data.id;
+        });
+
+        it('deve atualizar um veículo existente', async () => {
+            const updateData = {
+                brand: 'Marca Atualizada',
+                model: 'Modelo Atualizado'
+            };
+
+            const response = await request(app)
+                .put(`/api/vehicles/${vehicleId}`)
+                .send(updateData)
+                .expect(200);
+
+            expect(response.body.success).toBe(true);
+            expect(response.body.data.brand).toBe(updateData.brand);
+            expect(response.body.data.model).toBe(updateData.model);
+        });
+
+        it('deve retornar erro ao atualizar veículo inexistente', async () => {
+            const updateData = {
+                brand: 'Marca Atualizada'
+            };
+
+            const response = await request(app)
+                .put('/api/vehicles/999999')
+                .send(updateData)
+                .expect(404);
+
+            expect(response.body.success).toBe(false);
+        });
+    });
+
+    describe('DELETE /api/vehicles/:id', () => {
+        let vehicleId: number;
+
+        beforeEach(async () => {
+            const createResponse = await request(app)
+                .post('/api/vehicles')
+                .send({
+                    brand: 'Veículo para Deletar',
+                    model: 'Modelo Teste',
+                    year: 2020,
+                    licensePlate: 'DEL1234',
+                    clientId: clientId
+                });
+            
+            vehicleId = createResponse.body.data.id;
+        });
+
+        it('deve deletar um veículo existente', async () => {
+            const response = await request(app)
+                .delete(`/api/vehicles/${vehicleId}`)
+                .expect(200);
+
+            expect(response.body.success).toBe(true);
+            expect(response.body.message).toContain('deletado com sucesso');
+
+            // Verificar se realmente foi deletado
+            await request(app)
+                .get(`/api/vehicles/${vehicleId}`)
+                .expect(404);
+        });
+
+        it('deve retornar erro ao deletar veículo inexistente', async () => {
+            const response = await request(app)
+                .delete('/api/vehicles/999999')
+                .expect(404);
+
+            expect(response.body.success).toBe(false);
+        });
+    });
+
+    describe('Fluxo completo do veículo', () => {
+        it('deve executar o CRUD completo de um veículo', async () => {
+            // 1. Criar veículo
+            const vehicleData = {
+                brand: 'Fluxo Completo',
+                model: 'Modelo Teste',
+                year: 2020,
+                licensePlate: 'FLX1234',
+                clientId: clientId
+            };
+
+            const createResponse = await request(app)
+                .post('/api/vehicles')
+                .send(vehicleData)
+                .expect(201);
+
+            const vehicleId = createResponse.body.data.id;
+            expect(createResponse.body.success).toBe(true);
+
+            // 2. Buscar veículo criado
+            const getResponse = await request(app)
+                .get(`/api/vehicles/${vehicleId}`)
+                .expect(200);
+
+            expect(getResponse.body.data.brand).toBe(vehicleData.brand);
+
+            // 3. Buscar por cliente
+            const getByClientResponse = await request(app)
+                .get(`/api/vehicles/client/${clientId}`)
+                .expect(200);
+
+            const foundVehicle = getByClientResponse.body.data.find(v => v.id === vehicleId);
+            expect(foundVehicle).toBeDefined();
+
+            // 4. Atualizar veículo
+            const updateData = { brand: 'Marca Atualizada', model: 'Modelo Atualizado' };
+            const updateResponse = await request(app)
+                .put(`/api/vehicles/${vehicleId}`)
+                .send(updateData)
+                .expect(200);
+
+            expect(updateResponse.body.data.brand).toBe(updateData.brand);
+            expect(updateResponse.body.data.model).toBe(updateData.model);
+
+            // 5. Verificar atualização
+            const getUpdatedResponse = await request(app)
+                .get(`/api/vehicles/${vehicleId}`)
+                .expect(200);
+
+            expect(getUpdatedResponse.body.data.brand).toBe(updateData.brand);
+
+            // 6. Deletar veículo
+            await request(app)
+                .delete(`/api/vehicles/${vehicleId}`)
+                .expect(200);
+
+            // 7. Verificar que foi deletado
+            await request(app)
+                .get(`/api/vehicles/${vehicleId}`)
+                .expect(404);
+        });
+    });
+});

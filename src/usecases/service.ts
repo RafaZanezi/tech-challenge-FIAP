@@ -63,7 +63,7 @@ export class ServiceUseCases {
     }
 
     const updatedServiceDTO = await this.serviceGateway.update(id, { 
-      name, 
+      name: name ?? service.name, 
       description: description ?? service.description, 
       price: price ?? service.price 
     });

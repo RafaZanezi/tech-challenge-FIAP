@@ -1,7 +1,7 @@
 import { Vehicle } from '../entities/vehicle';
 import { BasePresenter } from './base-presenter';
 
-export class VehicleCreatedPresenter extends BasePresenter {
+export class VehiclePresenter extends BasePresenter {
   present(vehicle: Vehicle): void {
     this.statusCode = 201;
 
@@ -36,6 +36,49 @@ export class VehicleCreatedPresenter extends BasePresenter {
           clientId: vehicle.clientId
         };
       })
+    };
+  }
+
+  presentFound(vehicle: Vehicle): void {
+    this.statusCode = 200;
+    const { id, brand, model, year, licensePlate, clientId } = vehicle;
+
+    this.response = {
+      success: true,
+      data: {
+        id,
+        brand,
+        model,
+        year,
+        licensePlate,
+        clientId
+      }
+    };
+  }
+
+  presentUpdated(vehicle: Vehicle): void {
+    this.statusCode = 200;
+    const { id, brand, model, year, licensePlate, clientId } = vehicle;
+
+    this.response = {
+      success: true,
+      data: {
+        id,
+        brand,
+        model,
+        year,
+        licensePlate,
+        clientId
+      }
+    };
+  }
+
+  presentDeleted(vehicle: Vehicle): void {
+    this.statusCode = 200;
+
+    this.response = {
+      success: true,
+      message: `Veículo com ID ${vehicle.id} deletado com sucesso`
     };
   }
 }
