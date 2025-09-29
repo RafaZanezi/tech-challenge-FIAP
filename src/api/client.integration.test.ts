@@ -2,10 +2,12 @@ import request from 'supertest';
 import express from 'express';
 import { TestDatabaseConnection, validCPF, invalidCPF } from '../../test/setup/integration-test-setup';
 import { ClientAPI } from './client';
+import { AuthAPI } from './auth';
 
 describe('Cliente Integration Tests', () => {
     let app: express.Application;
     let testDb: TestDatabaseConnection;
+    let authToken: string;
 
     beforeAll(async () => {
         testDb = new TestDatabaseConnection();
@@ -15,8 +17,36 @@ describe('Cliente Integration Tests', () => {
         app.use(express.json());
         app.use(express.urlencoded({ extended: true }));
         
+        const authAPI = new AuthAPI(testDb);
         const clientAPI = new ClientAPI(testDb);
+        app.use('/api', authAPI.getRoutes());
         app.use('/api', clientAPI.getRoutes());
+        
+        // Add error handling middleware
+        app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+            if (err.statusCode) {
+                return res.status(err.statusCode).json({
+                    success: false,
+                    message: err.message
+                });
+            }
+            return res.status(500).json({
+                success: false,
+                message: 'Internal Server Error'
+            });
+        });
+        
+        // Create admin user and get token
+        const registerResponse = await request(app)
+            .post('/api/auth/register')
+            
+                .set('Authorization', `Bearer ${authToken}`).send({
+                name: 'TestAdmin',
+                password: 'password123',
+                role: 'admin'
+            });
+        
+        authToken = registerResponse.body.data.token;
     });
 
     beforeEach(async () => {
@@ -36,7 +66,8 @@ describe('Cliente Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/clients')
-                .send(clientData)
+                
+                .set('Authorization', `Bearer ${authToken}`).send(clientData)
                 .expect(201);
 
             expect(response.body.success).toBe(true);
@@ -53,7 +84,8 @@ describe('Cliente Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/clients')
-                .send(clientData)
+                
+                .set('Authorization', `Bearer ${authToken}`).send(clientData)
                 .expect(400);
 
             expect(response.body.success).toBe(false);
@@ -68,7 +100,8 @@ describe('Cliente Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/clients')
-                .send(clientData)
+                
+                .set('Authorization', `Bearer ${authToken}`).send(clientData)
                 .expect(400);
 
             expect(response.body.success).toBe(false);
@@ -83,7 +116,8 @@ describe('Cliente Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/clients')
-                .send(clientData)
+                
+                .set('Authorization', `Bearer ${authToken}`).send(clientData)
                 .expect(400);
 
             expect(response.body.success).toBe(false);
@@ -96,17 +130,20 @@ describe('Cliente Integration Tests', () => {
             // Criar alguns clientes para teste
             await request(app)
                 .post('/api/clients')
-                .send({ name: 'João Silva', identifier: validCPF });
+                
+                .set('Authorization', `Bearer ${authToken}`).send({ name: 'João Silva', identifier: validCPF });
             
             await request(app)
                 .post('/api/clients')
-                .send({ name: 'Maria Santos', identifier: '98765432111' });
+                
+                .set('Authorization', `Bearer ${authToken}`).send({ name: 'Maria Santos', identifier: '98765432111' });
         });
 
         it('deve retornar todos os clientes', async () => {
             const response = await request(app)
                 .get('/api/clients')
-                .expect(200);
+                
+                .set('Authorization', `Bearer ${authToken}`).expect(200);
 
             expect(response.body.success).toBe(true);
             expect(Array.isArray(response.body.data)).toBe(true);
@@ -117,13 +154,15 @@ describe('Cliente Integration Tests', () => {
             // Primeiro criar um cliente
             const createResponse = await request(app)
                 .post('/api/clients')
-                .send({ name: 'Pedro Oliveira', identifier: '11122233396' });
+                
+                .set('Authorization', `Bearer ${authToken}`).send({ name: 'Pedro Oliveira', identifier: '11122233396' });
 
             const clientId = createResponse.body.data.id;
 
             const response = await request(app)
                 .get(`/api/clients/${clientId}`)
-                .expect(200);
+                
+                .set('Authorization', `Bearer ${authToken}`).expect(200);
 
             expect(response.body.success).toBe(true);
             expect(response.body.data.id).toBe(clientId);
@@ -133,7 +172,8 @@ describe('Cliente Integration Tests', () => {
         it('deve retornar erro ao buscar cliente inexistente', async () => {
             const response = await request(app)
                 .get('/api/clients/999999')
-                .expect(404);
+                
+                .set('Authorization', `Bearer ${authToken}`).expect(404);
 
             expect(response.body.success).toBe(false);
         });
@@ -145,7 +185,8 @@ describe('Cliente Integration Tests', () => {
         beforeEach(async () => {
             const createResponse = await request(app)
                 .post('/api/clients')
-                .send({ name: 'Cliente Original', identifier: validCPF });
+                
+                .set('Authorization', `Bearer ${authToken}`).send({ name: 'Cliente Original', identifier: validCPF });
             
             clientId = createResponse.body.data.id;
         });
@@ -157,7 +198,8 @@ describe('Cliente Integration Tests', () => {
 
             const response = await request(app)
                 .put(`/api/clients/${clientId}`)
-                .send(updateData)
+                
+                .set('Authorization', `Bearer ${authToken}`).send(updateData)
                 .expect(200);
 
             expect(response.body.success).toBe(true);
@@ -171,7 +213,8 @@ describe('Cliente Integration Tests', () => {
 
             const response = await request(app)
                 .put('/api/clients/999999')
-                .send(updateData)
+                
+                .set('Authorization', `Bearer ${authToken}`).send(updateData)
                 .expect(404);
 
             expect(response.body.success).toBe(false);
@@ -184,7 +227,8 @@ describe('Cliente Integration Tests', () => {
         beforeEach(async () => {
             const createResponse = await request(app)
                 .post('/api/clients')
-                .send({ name: 'Cliente para Deletar', identifier: validCPF });
+                
+                .set('Authorization', `Bearer ${authToken}`).send({ name: 'Cliente para Deletar', identifier: validCPF });
             
             clientId = createResponse.body.data.id;
         });
@@ -192,7 +236,8 @@ describe('Cliente Integration Tests', () => {
         it('deve deletar um cliente existente', async () => {
             const response = await request(app)
                 .delete(`/api/clients/${clientId}`)
-                .expect(200);
+                
+                .set('Authorization', `Bearer ${authToken}`).expect(200);
 
             expect(response.body.success).toBe(true);
             expect(response.body.message).toContain('deletado com sucesso');
@@ -200,13 +245,15 @@ describe('Cliente Integration Tests', () => {
             // Verificar se realmente foi deletado
             await request(app)
                 .get(`/api/clients/${clientId}`)
-                .expect(404);
+                
+                .set('Authorization', `Bearer ${authToken}`).expect(404);
         });
 
         it('deve retornar erro ao deletar cliente inexistente', async () => {
             const response = await request(app)
                 .delete('/api/clients/999999')
-                .expect(404);
+                
+                .set('Authorization', `Bearer ${authToken}`).expect(404);
 
             expect(response.body.success).toBe(false);
         });
@@ -222,7 +269,8 @@ describe('Cliente Integration Tests', () => {
 
             const createResponse = await request(app)
                 .post('/api/clients')
-                .send(clientData)
+                
+                .set('Authorization', `Bearer ${authToken}`).send(clientData)
                 .expect(201);
 
             const clientId = createResponse.body.data.id;
@@ -231,7 +279,8 @@ describe('Cliente Integration Tests', () => {
             // 2. Buscar cliente criado
             const getResponse = await request(app)
                 .get(`/api/clients/${clientId}`)
-                .expect(200);
+                
+                .set('Authorization', `Bearer ${authToken}`).expect(200);
 
             expect(getResponse.body.data.name).toBe(clientData.name);
 
@@ -239,7 +288,8 @@ describe('Cliente Integration Tests', () => {
             const updateData = { name: 'Nome Atualizado' };
             const updateResponse = await request(app)
                 .put(`/api/clients/${clientId}`)
-                .send(updateData)
+                
+                .set('Authorization', `Bearer ${authToken}`).send(updateData)
                 .expect(200);
 
             expect(updateResponse.body.data.name).toBe(updateData.name);
@@ -247,19 +297,22 @@ describe('Cliente Integration Tests', () => {
             // 4. Verificar atualização
             const getUpdatedResponse = await request(app)
                 .get(`/api/clients/${clientId}`)
-                .expect(200);
+                
+                .set('Authorization', `Bearer ${authToken}`).expect(200);
 
             expect(getUpdatedResponse.body.data.name).toBe(updateData.name);
 
             // 5. Deletar cliente
             await request(app)
                 .delete(`/api/clients/${clientId}`)
-                .expect(200);
+                
+                .set('Authorization', `Bearer ${authToken}`).expect(200);
 
             // 6. Verificar que foi deletado
             await request(app)
                 .get(`/api/clients/${clientId}`)
-                .expect(404);
+                
+                .set('Authorization', `Bearer ${authToken}`).expect(404);
         });
     });
 });

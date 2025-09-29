@@ -14,17 +14,12 @@ export class ClientAPI {
     const clientController = new ClientController(this._dbConnection);
 
     const routerClients = express.Router();
-
-    routerClients.get('/clients', clientController.find);
-    routerClients.get('/clients/:id', clientController.find);
-    routerClients.post('/clients', clientController.create);
-    routerClients.put('/clients/:id', clientController.update);
-    routerClients.delete('/clients/:id', clientController.delete);
-    // routerClients.get('/clients', verifyJWT, requireAdmin, clientController.find);
-    // routerClients.get('/clients/:id', verifyJWT, requireAdmin, clientController.find);
-    // routerClients.post('/clients', verifyJWT, requireAdmin, clientController.create);
-    // routerClients.put('/clients/:id', verifyJWT, requireAdmin, clientController.update);
-    // routerClients.delete('/clients/:id', verifyJWT, requireAdmin, clientController.delete);
+    
+    routerClients.get('/clients', verifyJWT, requireAdmin, clientController.find);
+    routerClients.get('/clients/:id', verifyJWT, requireAdmin, clientController.find);
+    routerClients.post('/clients', verifyJWT, requireAdmin, clientController.create);
+    routerClients.put('/clients/:id', verifyJWT, requireAdmin, clientController.update);
+    routerClients.delete('/clients/:id', verifyJWT, requireAdmin, clientController.delete);
 
     return routerClients;
   }

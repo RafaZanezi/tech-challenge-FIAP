@@ -1,3 +1,4 @@
+import { UserDTO } from "../dtos/auth";
 import { ClientDTO } from "../dtos/client";
 import { ServiceDTO } from "../dtos/service";
 import { ServiceOrderDTO } from "../dtos/service-order";
@@ -7,13 +8,16 @@ import { Client } from "../entities/client";
 import { Service } from "../entities/service";
 import { ServiceOrder } from "../entities/service-order";
 import { Supply } from "../entities/supply";
-import { User } from "../entities/user-new";
+import { User } from "../entities/auth-user";
 import { Vehicle } from "../entities/vehicle";
 
-interface AuthGatewayInterface {
-    registerUser(name: string, password: string, role: string): Promise<User>;
-    loginUser(name: string, password: string): Promise<User | null>;
-    logoutUser(userId: string): Promise<void>;
+interface UserGatewayInterface {
+    findById(id: number): Promise<UserDTO | null>;
+    findByName(name: string): Promise<UserDTO | null>;
+    findAll(): Promise<UserDTO[]>;
+    insert(entity: User): Promise<UserDTO>;
+    update(id: number, entity: Partial<User>): Promise<UserDTO>;
+    delete(id: number): Promise<void>;
 }
 
 interface ClientGatewayInterface {
@@ -63,7 +67,7 @@ interface ServiceOrderGatewayInterface {
 }
 
 export {
-    AuthGatewayInterface,
+    UserGatewayInterface,
     ClientGatewayInterface,
     ServiceGatewayInterface,
     SupplyGatewayInterface,

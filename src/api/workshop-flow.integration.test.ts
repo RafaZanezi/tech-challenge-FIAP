@@ -5,10 +5,12 @@ import { ClientAPI } from './client';
 import { VehicleAPI } from './vehicle';
 import { ServiceAPI } from './service';
 import { SupplyAPI } from './supply';
+import { AuthAPI } from './auth';
 
 describe('Workshop Integration Flow Tests', () => {
     let app: express.Application;
     let testDb: TestDatabaseConnection;
+    let authToken: string;
 
     beforeAll(async () => {
         testDb = new TestDatabaseConnection();
@@ -19,15 +21,42 @@ describe('Workshop Integration Flow Tests', () => {
         app.use(express.urlencoded({ extended: true }));
         
         // Configurar todas as APIs
+        const authAPI = new AuthAPI(testDb);
         const clientAPI = new ClientAPI(testDb);
         const vehicleAPI = new VehicleAPI(testDb);
         const serviceAPI = new ServiceAPI(testDb);
         const supplyAPI = new SupplyAPI(testDb);
         
+        app.use('/api', authAPI.getRoutes());
         app.use('/api', clientAPI.getRoutes());
         app.use('/api', vehicleAPI.getRoutes());
         app.use('/api', serviceAPI.getRoutes());
         app.use('/api', supplyAPI.getRoutes());
+        
+        // Add error handling middleware
+        app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+            if (err.statusCode) {
+                return res.status(err.statusCode).json({
+                    success: false,
+                    message: err.message
+                });
+            }
+            return res.status(500).json({
+                success: false,
+                message: 'Internal Server Error'
+            });
+        });
+        
+        // Create admin user and get token
+        const registerResponse = await request(app)
+            .post('/api/auth/register')
+            .send({
+                name: 'TestAdmin',
+                password: 'password123',
+                role: 'admin'
+            });
+        
+        authToken = registerResponse.body.data.token;
     });
 
     beforeEach(async () => {
@@ -48,6 +77,7 @@ describe('Workshop Integration Flow Tests', () => {
 
             const clientResponse = await request(app)
                 .post('/api/clients')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send(clientData)
                 .expect(201);
 
@@ -65,6 +95,7 @@ describe('Workshop Integration Flow Tests', () => {
 
             const vehicleResponse = await request(app)
                 .post('/api/vehicles')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send(vehicleData)
                 .expect(201);
 
@@ -89,6 +120,7 @@ describe('Workshop Integration Flow Tests', () => {
             for (const service of services) {
                 const serviceResponse = await request(app)
                     .post('/api/services')
+                    .set('Authorization', `Bearer ${authToken}`)
                     .send(service)
                     .expect(201);
 
@@ -124,6 +156,7 @@ describe('Workshop Integration Flow Tests', () => {
             for (const supply of supplies) {
                 const supplyResponse = await request(app)
                     .post('/api/supplies')
+                    .set('Authorization', `Bearer ${authToken}`)
                     .send(supply)
                     .expect(201);
 
@@ -135,6 +168,7 @@ describe('Workshop Integration Flow Tests', () => {
             // Verificar veículos do cliente
             const clientVehiclesResponse = await request(app)
                 .get(`/api/vehicles/client/${clientId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(clientVehiclesResponse.body.data.length).toBe(1);
@@ -145,6 +179,7 @@ describe('Workshop Integration Flow Tests', () => {
             const oilSupplyId = supplyIds[0];
             await request(app)
                 .put(`/api/supplies/${oilSupplyId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({ quantity: 19 })
                 .expect(200);
 
@@ -152,6 +187,7 @@ describe('Workshop Integration Flow Tests', () => {
             const oilFilterId = supplyIds[1];
             await request(app)
                 .put(`/api/supplies/${oilFilterId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({ quantity: 29 })
                 .expect(200);
 
@@ -159,6 +195,7 @@ describe('Workshop Integration Flow Tests', () => {
             // Verificar se cliente ainda existe
             const finalClientResponse = await request(app)
                 .get(`/api/clients/${clientId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(finalClientResponse.body.data.name).toBe(clientData.name);
@@ -166,6 +203,7 @@ describe('Workshop Integration Flow Tests', () => {
             // Verificar se veículo ainda existe
             const finalVehicleResponse = await request(app)
                 .get(`/api/vehicles/${vehicleId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(finalVehicleResponse.body.data.licensePlate).toBe(vehicleData.licensePlate);
@@ -173,6 +211,7 @@ describe('Workshop Integration Flow Tests', () => {
             // Verificar estoque atualizado
             const finalOilResponse = await request(app)
                 .get(`/api/supplies/${oilSupplyId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(finalOilResponse.body.data.quantity).toBe(19);
@@ -180,6 +219,7 @@ describe('Workshop Integration Flow Tests', () => {
             // Verificar todos os serviços cadastrados
             const allServicesResponse = await request(app)
                 .get('/api/services')
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(allServicesResponse.body.data.length).toBeGreaterThanOrEqual(2);
@@ -187,6 +227,7 @@ describe('Workshop Integration Flow Tests', () => {
             // Verificar todos os insumos cadastrados
             const allSuppliesResponse = await request(app)
                 .get('/api/supplies')
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(allSuppliesResponse.body.data.length).toBeGreaterThanOrEqual(4);
@@ -196,6 +237,7 @@ describe('Workshop Integration Flow Tests', () => {
             // 1. Criar cliente
             const clientResponse = await request(app)
                 .post('/api/clients')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     name: 'Maria Santos',
                     identifier: validCPF
@@ -207,6 +249,7 @@ describe('Workshop Integration Flow Tests', () => {
             // 2. Criar veículo para o cliente
             const vehicleResponse = await request(app)
                 .post('/api/vehicles')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     brand: 'Honda',
                     model: 'Civic',
@@ -221,6 +264,7 @@ describe('Workshop Integration Flow Tests', () => {
             // 3. Verificar que o veículo está associado ao cliente correto
             const vehiclesByClientResponse = await request(app)
                 .get(`/api/vehicles/client/${clientId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(vehiclesByClientResponse.body.data).toHaveLength(1);
@@ -230,6 +274,7 @@ describe('Workshop Integration Flow Tests', () => {
             // 4. Tentar criar veículo com cliente inexistente deve falhar
             await request(app)
                 .post('/api/vehicles')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     brand: 'Ford',
                     model: 'Focus',
@@ -244,6 +289,7 @@ describe('Workshop Integration Flow Tests', () => {
             // 1. Criar cliente
             const clientResponse = await request(app)
                 .post('/api/clients')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     name: 'Carlos Oliveira',
                     identifier: validCPF
@@ -281,6 +327,7 @@ describe('Workshop Integration Flow Tests', () => {
             for (const vehicle of vehicles) {
                 const vehicleResponse = await request(app)
                     .post('/api/vehicles')
+                    .set('Authorization', `Bearer ${authToken}`)
                     .send(vehicle)
                     .expect(201);
 
@@ -290,6 +337,7 @@ describe('Workshop Integration Flow Tests', () => {
             // 3. Verificar que todos os veículos estão associados ao cliente
             const clientVehiclesResponse = await request(app)
                 .get(`/api/vehicles/client/${clientId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(clientVehiclesResponse.body.data).toHaveLength(3);
@@ -313,6 +361,7 @@ describe('Workshop Integration Flow Tests', () => {
             for (const supply of initialSupplies) {
                 const response = await request(app)
                     .post('/api/supplies')
+                    .set('Authorization', `Bearer ${authToken}`)
                     .send(supply)
                     .expect(201);
                 supplyIds.push(response.body.data.id);
@@ -322,34 +371,40 @@ describe('Workshop Integration Flow Tests', () => {
             // Troca de óleo consome: 4L de óleo + 1 filtro
             await request(app)
                 .put(`/api/supplies/${supplyIds[0]}`) // Óleo
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({ quantity: 46 }) // 50 - 4 = 46
                 .expect(200);
 
             await request(app)
                 .put(`/api/supplies/${supplyIds[1]}`) // Filtro
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({ quantity: 99 }) // 100 - 1 = 99
                 .expect(200);
 
             // 3. Verificar estoque atualizado
             const oilResponse = await request(app)
                 .get(`/api/supplies/${supplyIds[0]}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
             expect(oilResponse.body.data.quantity).toBe(46);
 
             const filterResponse = await request(app)
                 .get(`/api/supplies/${supplyIds[1]}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
             expect(filterResponse.body.data.quantity).toBe(99);
 
             // 4. Simular reposição de estoque
             await request(app)
                 .put(`/api/supplies/${supplyIds[0]}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({ quantity: 60 }) // Reposição de óleo
                 .expect(200);
 
             // 5. Verificar reposição
             const restockedOilResponse = await request(app)
                 .get(`/api/supplies/${supplyIds[0]}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
             expect(restockedOilResponse.body.data.quantity).toBe(60);
         });
@@ -367,6 +422,7 @@ describe('Workshop Integration Flow Tests', () => {
 
             await request(app)
                 .post('/api/vehicles')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send(vehicleData)
                 .expect(400);
         });
@@ -375,6 +431,7 @@ describe('Workshop Integration Flow Tests', () => {
             // 1. Criar cliente com sucesso
             const clientResponse = await request(app)
                 .post('/api/clients')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     name: 'Teste Consistência',
                     identifier: validCPF
@@ -386,6 +443,7 @@ describe('Workshop Integration Flow Tests', () => {
             // 2. Tentar criar veículo com dados inválidos
             await request(app)
                 .post('/api/vehicles')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     brand: '', // Inválido
                     model: 'Modelo',
@@ -398,6 +456,7 @@ describe('Workshop Integration Flow Tests', () => {
             // 3. Verificar que cliente ainda existe
             const clientStillExistsResponse = await request(app)
                 .get(`/api/clients/${clientId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(clientStillExistsResponse.body.data.name).toBe('Teste Consistência');
@@ -405,6 +464,7 @@ describe('Workshop Integration Flow Tests', () => {
             // 4. Criar veículo válido deve funcionar
             await request(app)
                 .post('/api/vehicles')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     brand: 'Marca Válida',
                     model: 'Modelo Válido',

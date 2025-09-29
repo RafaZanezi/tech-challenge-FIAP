@@ -2,10 +2,12 @@ import request from 'supertest';
 import express from 'express';
 import { TestDatabaseConnection } from '../../test/setup/integration-test-setup';
 import { SupplyAPI } from './supply';
+import { AuthAPI } from './auth';
 
 describe('Supply Integration Tests', () => {
     let app: express.Application;
     let testDb: TestDatabaseConnection;
+    let authToken: string;
 
     beforeAll(async () => {
         testDb = new TestDatabaseConnection();
@@ -15,8 +17,35 @@ describe('Supply Integration Tests', () => {
         app.use(express.json());
         app.use(express.urlencoded({ extended: true }));
         
+        const authAPI = new AuthAPI(testDb);
         const supplyAPI = new SupplyAPI(testDb);
+        app.use('/api', authAPI.getRoutes());
         app.use('/api', supplyAPI.getRoutes());
+        
+        // Add error handling middleware
+        app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+            if (err.statusCode) {
+                return res.status(err.statusCode).json({
+                    success: false,
+                    message: err.message
+                });
+            }
+            return res.status(500).json({
+                success: false,
+                message: 'Internal Server Error'
+            });
+        });
+        
+        // Create admin user and get token
+        const registerResponse = await request(app)
+            .post('/api/auth/register')
+            .send({
+                name: 'TestAdmin',
+                password: 'password123',
+                role: 'admin'
+            });
+        
+        authToken = registerResponse.body.data.token;
     });
 
     beforeEach(async () => {
@@ -37,6 +66,7 @@ describe('Supply Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/supplies')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send(supplyData)
                 .expect(201);
 
@@ -56,6 +86,7 @@ describe('Supply Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/supplies')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send(supplyData)
                 .expect(201);
 
@@ -72,6 +103,7 @@ describe('Supply Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/supplies')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send(supplyData)
                 .expect(201);
 
@@ -88,6 +120,7 @@ describe('Supply Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/supplies')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send(supplyData)
                 .expect(400);
 
@@ -104,6 +137,7 @@ describe('Supply Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/supplies')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send(supplyData)
                 .expect(400);
 
@@ -120,6 +154,7 @@ describe('Supply Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/supplies')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send(supplyData)
                 .expect(400);
 
@@ -133,6 +168,7 @@ describe('Supply Integration Tests', () => {
             // Criar alguns insumos para teste
             await request(app)
                 .post('/api/supplies')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     name: 'Óleo 5W30',
                     quantity: 10,
@@ -141,6 +177,7 @@ describe('Supply Integration Tests', () => {
             
             await request(app)
                 .post('/api/supplies')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     name: 'Filtro de Óleo',
                     quantity: 25,
@@ -151,6 +188,7 @@ describe('Supply Integration Tests', () => {
         it('deve retornar todos os insumos', async () => {
             const response = await request(app)
                 .get('/api/supplies')
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(response.body.success).toBe(true);
@@ -162,6 +200,7 @@ describe('Supply Integration Tests', () => {
             // Primeiro criar um insumo
             const createResponse = await request(app)
                 .post('/api/supplies')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     name: 'Pastilha de Freio',
                     quantity: 8,
@@ -172,6 +211,7 @@ describe('Supply Integration Tests', () => {
 
             const response = await request(app)
                 .get(`/api/supplies/${supplyId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(response.body.success).toBe(true);
@@ -182,6 +222,7 @@ describe('Supply Integration Tests', () => {
         it('deve retornar erro ao buscar insumo inexistente', async () => {
             const response = await request(app)
                 .get('/api/supplies/999999')
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(404);
 
             expect(response.body.success).toBe(false);
@@ -194,6 +235,7 @@ describe('Supply Integration Tests', () => {
         beforeEach(async () => {
             const createResponse = await request(app)
                 .post('/api/supplies')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     name: 'Insumo Original',
                     quantity: 5,
@@ -212,6 +254,7 @@ describe('Supply Integration Tests', () => {
 
             const response = await request(app)
                 .put(`/api/supplies/${supplyId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .send(updateData)
                 .expect(200);
 
@@ -228,6 +271,7 @@ describe('Supply Integration Tests', () => {
 
             const response = await request(app)
                 .put(`/api/supplies/${supplyId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .send(updateData)
                 .expect(200);
 
@@ -243,6 +287,7 @@ describe('Supply Integration Tests', () => {
 
             const response = await request(app)
                 .put(`/api/supplies/${supplyId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .send(updateData)
                 .expect(200);
 
@@ -257,6 +302,7 @@ describe('Supply Integration Tests', () => {
 
             const response = await request(app)
                 .put('/api/supplies/999999')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send(updateData)
                 .expect(404);
 
@@ -270,6 +316,7 @@ describe('Supply Integration Tests', () => {
         beforeEach(async () => {
             const createResponse = await request(app)
                 .post('/api/supplies')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     name: 'Insumo para Deletar',
                     quantity: 3,
@@ -282,6 +329,7 @@ describe('Supply Integration Tests', () => {
         it('deve deletar um insumo existente', async () => {
             const response = await request(app)
                 .delete(`/api/supplies/${supplyId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(response.body.success).toBe(true);
@@ -290,12 +338,14 @@ describe('Supply Integration Tests', () => {
             // Verificar se realmente foi deletado
             await request(app)
                 .get(`/api/supplies/${supplyId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(404);
         });
 
         it('deve retornar erro ao deletar insumo inexistente', async () => {
             const response = await request(app)
                 .delete('/api/supplies/999999')
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(404);
 
             expect(response.body.success).toBe(false);
@@ -330,6 +380,7 @@ describe('Supply Integration Tests', () => {
             for (const supply of supplies) {
                 const response = await request(app)
                     .post('/api/supplies')
+                    .set('Authorization', `Bearer ${authToken}`)
                     .send(supply)
                     .expect(201);
 
@@ -349,6 +400,7 @@ describe('Supply Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/supplies')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send(supplyData)
                 .expect(201);
 
@@ -361,6 +413,7 @@ describe('Supply Integration Tests', () => {
             // Criar insumo com estoque
             const createResponse = await request(app)
                 .post('/api/supplies')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     name: 'Insumo Estoque',
                     quantity: 100,
@@ -372,12 +425,14 @@ describe('Supply Integration Tests', () => {
             // Simular consumo de estoque
             await request(app)
                 .put(`/api/supplies/${supplyId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({ quantity: 75 })
                 .expect(200);
 
             // Verificar se estoque foi atualizado
             const getResponse = await request(app)
                 .get(`/api/supplies/${supplyId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(getResponse.body.data.quantity).toBe(75);
@@ -385,12 +440,14 @@ describe('Supply Integration Tests', () => {
             // Zerar estoque
             await request(app)
                 .put(`/api/supplies/${supplyId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({ quantity: 0 })
                 .expect(200);
 
             // Verificar se estoque foi zerado
             const getFinalResponse = await request(app)
                 .get(`/api/supplies/${supplyId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(getFinalResponse.body.data.quantity).toBe(0);
@@ -408,6 +465,7 @@ describe('Supply Integration Tests', () => {
 
             const createResponse = await request(app)
                 .post('/api/supplies')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send(supplyData)
                 .expect(201);
 
@@ -417,6 +475,7 @@ describe('Supply Integration Tests', () => {
             // 2. Buscar insumo criado
             const getResponse = await request(app)
                 .get(`/api/supplies/${supplyId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(getResponse.body.data.name).toBe(supplyData.name);
@@ -432,6 +491,7 @@ describe('Supply Integration Tests', () => {
             
             const updateResponse = await request(app)
                 .put(`/api/supplies/${supplyId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .send(updateData)
                 .expect(200);
 
@@ -442,6 +502,7 @@ describe('Supply Integration Tests', () => {
             // 4. Verificar atualização
             const getUpdatedResponse = await request(app)
                 .get(`/api/supplies/${supplyId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(getUpdatedResponse.body.data.name).toBe(updateData.name);
@@ -450,11 +511,13 @@ describe('Supply Integration Tests', () => {
             // 5. Deletar insumo
             await request(app)
                 .delete(`/api/supplies/${supplyId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             // 6. Verificar que foi deletado
             await request(app)
                 .get(`/api/supplies/${supplyId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(404);
         });
     });

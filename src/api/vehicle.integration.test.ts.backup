@@ -83,7 +83,6 @@ describe('Vehicle Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/vehicles')
-                .set('Authorization', `Bearer ${authToken}`)
                 .send(vehicleData)
                 .expect(201);
 
@@ -107,7 +106,6 @@ describe('Vehicle Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/vehicles')
-                .set('Authorization', `Bearer ${authToken}`)
                 .send(vehicleData)
                 .expect(201);
 
@@ -126,7 +124,6 @@ describe('Vehicle Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/vehicles')
-                .set('Authorization', `Bearer ${authToken}`)
                 .send(vehicleData)
                 .expect(400);
 
@@ -145,7 +142,6 @@ describe('Vehicle Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/vehicles')
-                .set('Authorization', `Bearer ${authToken}`)
                 .send(vehicleData)
                 .expect(400);
 
@@ -164,7 +160,6 @@ describe('Vehicle Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/vehicles')
-                .set('Authorization', `Bearer ${authToken}`)
                 .send(vehicleData)
                 .expect(400);
 
@@ -183,7 +178,6 @@ describe('Vehicle Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/vehicles')
-                .set('Authorization', `Bearer ${authToken}`)
                 .send(vehicleData)
                 .expect(400);
 
@@ -196,7 +190,6 @@ describe('Vehicle Integration Tests', () => {
             // Criar alguns veículos para teste
             await request(app)
                 .post('/api/vehicles')
-                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     brand: 'Toyota',
                     model: 'Corolla',
@@ -207,7 +200,6 @@ describe('Vehicle Integration Tests', () => {
             
             await request(app)
                 .post('/api/vehicles')
-                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     brand: 'Honda',
                     model: 'Civic',
@@ -220,7 +212,6 @@ describe('Vehicle Integration Tests', () => {
         it('deve retornar todos os veículos', async () => {
             const response = await request(app)
                 .get('/api/vehicles')
-                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(response.body.success).toBe(true);
@@ -232,7 +223,6 @@ describe('Vehicle Integration Tests', () => {
             // Primeiro criar um veículo
             const createResponse = await request(app)
                 .post('/api/vehicles')
-                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     brand: 'Ford',
                     model: 'Focus',
@@ -245,7 +235,6 @@ describe('Vehicle Integration Tests', () => {
 
             const response = await request(app)
                 .get(`/api/vehicles/${vehicleId}`)
-                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(response.body.success).toBe(true);
@@ -257,7 +246,6 @@ describe('Vehicle Integration Tests', () => {
         it('deve retornar veículos de um cliente específico', async () => {
             const response = await request(app)
                 .get(`/api/vehicles/client/${clientId}`)
-                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(response.body.success).toBe(true);
@@ -272,7 +260,6 @@ describe('Vehicle Integration Tests', () => {
         it('deve retornar erro ao buscar veículo inexistente', async () => {
             const response = await request(app)
                 .get('/api/vehicles/999999')
-                .set('Authorization', `Bearer ${authToken}`)
                 .expect(404);
 
             expect(response.body.success).toBe(false);
@@ -285,7 +272,6 @@ describe('Vehicle Integration Tests', () => {
         beforeEach(async () => {
             const createResponse = await request(app)
                 .post('/api/vehicles')
-                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     brand: 'Original Brand',
                     model: 'Original Model',
@@ -305,7 +291,6 @@ describe('Vehicle Integration Tests', () => {
 
             const response = await request(app)
                 .put(`/api/vehicles/${vehicleId}`)
-                .set('Authorization', `Bearer ${authToken}`)
                 .send(updateData)
                 .expect(200);
 
@@ -321,7 +306,6 @@ describe('Vehicle Integration Tests', () => {
 
             const response = await request(app)
                 .put('/api/vehicles/999999')
-                .set('Authorization', `Bearer ${authToken}`)
                 .send(updateData)
                 .expect(404);
 
@@ -335,7 +319,6 @@ describe('Vehicle Integration Tests', () => {
         beforeEach(async () => {
             const createResponse = await request(app)
                 .post('/api/vehicles')
-                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     brand: 'Veículo para Deletar',
                     model: 'Modelo Teste',
@@ -350,7 +333,6 @@ describe('Vehicle Integration Tests', () => {
         it('deve deletar um veículo existente', async () => {
             const response = await request(app)
                 .delete(`/api/vehicles/${vehicleId}`)
-                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(response.body.success).toBe(true);
@@ -359,14 +341,12 @@ describe('Vehicle Integration Tests', () => {
             // Verificar se realmente foi deletado
             await request(app)
                 .get(`/api/vehicles/${vehicleId}`)
-                .set('Authorization', `Bearer ${authToken}`)
                 .expect(404);
         });
 
         it('deve retornar erro ao deletar veículo inexistente', async () => {
             const response = await request(app)
                 .delete('/api/vehicles/999999')
-                .set('Authorization', `Bearer ${authToken}`)
                 .expect(404);
 
             expect(response.body.success).toBe(false);
@@ -386,7 +366,6 @@ describe('Vehicle Integration Tests', () => {
 
             const createResponse = await request(app)
                 .post('/api/vehicles')
-                .set('Authorization', `Bearer ${authToken}`)
                 .send(vehicleData)
                 .expect(201);
 
@@ -396,7 +375,6 @@ describe('Vehicle Integration Tests', () => {
             // 2. Buscar veículo criado
             const getResponse = await request(app)
                 .get(`/api/vehicles/${vehicleId}`)
-                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(getResponse.body.data.brand).toBe(vehicleData.brand);
@@ -404,7 +382,6 @@ describe('Vehicle Integration Tests', () => {
             // 3. Buscar por cliente
             const getByClientResponse = await request(app)
                 .get(`/api/vehicles/client/${clientId}`)
-                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             const foundVehicle = getByClientResponse.body.data.find(v => v.id === vehicleId);
@@ -414,7 +391,6 @@ describe('Vehicle Integration Tests', () => {
             const updateData = { brand: 'Marca Atualizada', model: 'Modelo Atualizado' };
             const updateResponse = await request(app)
                 .put(`/api/vehicles/${vehicleId}`)
-                .set('Authorization', `Bearer ${authToken}`)
                 .send(updateData)
                 .expect(200);
 
@@ -424,7 +400,6 @@ describe('Vehicle Integration Tests', () => {
             // 5. Verificar atualização
             const getUpdatedResponse = await request(app)
                 .get(`/api/vehicles/${vehicleId}`)
-                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(getUpdatedResponse.body.data.brand).toBe(updateData.brand);
@@ -432,13 +407,11 @@ describe('Vehicle Integration Tests', () => {
             // 6. Deletar veículo
             await request(app)
                 .delete(`/api/vehicles/${vehicleId}`)
-                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             // 7. Verificar que foi deletado
             await request(app)
                 .get(`/api/vehicles/${vehicleId}`)
-                .set('Authorization', `Bearer ${authToken}`)
                 .expect(404);
         });
     });

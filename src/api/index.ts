@@ -1,5 +1,6 @@
 import express from 'express';
 import { DatabaseConnection } from "../interfaces/connection";
+import { AuthAPI } from './auth';
 import { ClientAPI } from './client';
 import { ServiceAPI } from './service';
 import { ServiceOrderAPI } from './service-order';
@@ -17,6 +18,7 @@ export class WorkshopApp {
 	start() {
 		const app = express();
 
+		const authRoutes = new AuthAPI(this._dbConnection);
 		const clientRoutes = new ClientAPI(this._dbConnection);
 		const serviceRoutes = new ServiceAPI(this._dbConnection);
 		const serviceOrderRoutes = new ServiceOrderAPI(this._dbConnection);
@@ -30,8 +32,7 @@ export class WorkshopApp {
 			res.status(200).send({ title: 'Bem vindo ao Sistema Integrado de Atendimento e Execução de Serviços' });
 		});
 
-		// app.use('/auth', routerAuth);
-
+		app.use('/api', authRoutes.getRoutes());
 		app.use('/api', clientRoutes.getRoutes());
 		app.use('/api', serviceRoutes.getRoutes());
 		app.use('/api', serviceOrderRoutes.getRoutes());

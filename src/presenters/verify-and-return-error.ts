@@ -1,6 +1,6 @@
 import { ErrorPresenter } from "./error";
 import { ValidationErrorPresenter } from "./validation";
-import { ValidationError } from "../usecases/errors/errors";
+import { ValidationError, ConflictError } from "../usecases/errors/errors";
 import { HttpError } from "../api/errors/http-errors";
 
 export const verifyAndReturnError = (error, res) => {
@@ -8,6 +8,11 @@ export const verifyAndReturnError = (error, res) => {
 
     if (error instanceof ValidationError) {
         presenter = new ValidationErrorPresenter();
+    } else if (error instanceof ConflictError) {
+        presenter = new ErrorPresenter();
+        presenter.present(error.toHttpError());
+        res.status(error.toHttpError().statusCode).send(presenter.getResponse());
+        return;
     } else if (error instanceof HttpError) {
         presenter = new ErrorPresenter();
         presenter.present(error);

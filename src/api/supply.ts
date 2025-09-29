@@ -15,16 +15,11 @@ export class SupplyAPI {
 
     const routerSupplies = express.Router();
 
-    routerSupplies.get('/supplies', supplyController.find);
-    routerSupplies.get('/supplies/:id', supplyController.find);
-    routerSupplies.post('/supplies', supplyController.create);
-    routerSupplies.put('/supplies/:id', supplyController.update);
-    routerSupplies.delete('/supplies/:id', supplyController.delete);
-    // routerSupplies.get('/supplies', verifyJWT, requireAdmin, supplyController.find);
-    // routerSupplies.get('/supplies/:id', verifyJWT, requireAdmin, supplyController.find);
-    // routerSupplies.post('/supplies', verifyJWT, requireAdmin, supplyController.create);
-    // routerSupplies.put('/supplies/:id', verifyJWT, requireAdmin, supplyController.update);
-    // routerSupplies.delete('/supplies/:id', verifyJWT, requireAdmin, supplyController.delete);
+    routerSupplies.get('/supplies', verifyJWT, requireAdmin, supplyController.find);
+    routerSupplies.get('/supplies/:id', verifyJWT, requireAdmin, supplyController.find);
+    routerSupplies.post('/supplies', verifyJWT, requireAdmin, supplyController.create);
+    routerSupplies.put('/supplies/:id', verifyJWT, requireAdmin, supplyController.update);
+    routerSupplies.delete('/supplies/:id', verifyJWT, requireAdmin, supplyController.delete);
 
     return routerSupplies;
   }

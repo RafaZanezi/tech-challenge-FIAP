@@ -2,10 +2,12 @@ import request from 'supertest';
 import express from 'express';
 import { TestDatabaseConnection } from '../../test/setup/integration-test-setup';
 import { ServiceAPI } from './service';
+import { AuthAPI } from './auth';
 
 describe('Service Integration Tests', () => {
     let app: express.Application;
     let testDb: TestDatabaseConnection;
+    let authToken: string;
 
     beforeAll(async () => {
         testDb = new TestDatabaseConnection();
@@ -15,8 +17,35 @@ describe('Service Integration Tests', () => {
         app.use(express.json());
         app.use(express.urlencoded({ extended: true }));
         
+        const authAPI = new AuthAPI(testDb);
         const serviceAPI = new ServiceAPI(testDb);
+        app.use('/api', authAPI.getRoutes());
         app.use('/api', serviceAPI.getRoutes());
+        
+        // Add error handling middleware
+        app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+            if (err.statusCode) {
+                return res.status(err.statusCode).json({
+                    success: false,
+                    message: err.message
+                });
+            }
+            return res.status(500).json({
+                success: false,
+                message: 'Internal Server Error'
+            });
+        });
+        
+        // Create admin user and get token
+        const registerResponse = await request(app)
+            .post('/api/auth/register')
+            .send({
+                name: 'TestAdmin',
+                password: 'password123',
+                role: 'admin'
+            });
+        
+        authToken = registerResponse.body.data.token;
     });
 
     beforeEach(async () => {
@@ -37,6 +66,7 @@ describe('Service Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/services')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send(serviceData)
                 .expect(201);
 
@@ -56,7 +86,8 @@ describe('Service Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/services')
-                .send(serviceData)
+                
+                .set('Authorization', `Bearer ${authToken}`).send(serviceData)
                 .expect(400);
 
             expect(response.body.success).toBe(false);
@@ -72,7 +103,8 @@ describe('Service Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/services')
-                .send(serviceData)
+                
+                .set('Authorization', `Bearer ${authToken}`).send(serviceData)
                 .expect(400);
 
             expect(response.body.success).toBe(false);
@@ -88,7 +120,8 @@ describe('Service Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/services')
-                .send(serviceData)
+                
+                .set('Authorization', `Bearer ${authToken}`).send(serviceData)
                 .expect(400);
 
             expect(response.body.success).toBe(false);
@@ -104,7 +137,8 @@ describe('Service Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/services')
-                .send(serviceData)
+                
+                .set('Authorization', `Bearer ${authToken}`).send(serviceData)
                 .expect(400);
 
             expect(response.body.success).toBe(false);
@@ -117,6 +151,7 @@ describe('Service Integration Tests', () => {
             // Criar alguns serviços para teste
             await request(app)
                 .post('/api/services')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     name: 'Troca de Óleo',
                     description: 'Troca completa do óleo do motor',
@@ -125,6 +160,7 @@ describe('Service Integration Tests', () => {
             
             await request(app)
                 .post('/api/services')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     name: 'Alinhamento',
                     description: 'Alinhamento e balanceamento das rodas',
@@ -135,6 +171,7 @@ describe('Service Integration Tests', () => {
         it('deve retornar todos os serviços', async () => {
             const response = await request(app)
                 .get('/api/services')
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(response.body.success).toBe(true);
@@ -146,6 +183,7 @@ describe('Service Integration Tests', () => {
             // Primeiro criar um serviço
             const createResponse = await request(app)
                 .post('/api/services')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     name: 'Lavagem Completa',
                     description: 'Lavagem externa e interna do veículo',
@@ -156,6 +194,7 @@ describe('Service Integration Tests', () => {
 
             const response = await request(app)
                 .get(`/api/services/${serviceId}`)
+                .set('Authorization', `Bearer ${authToken}`)
                 .expect(200);
 
             expect(response.body.success).toBe(true);
@@ -166,7 +205,8 @@ describe('Service Integration Tests', () => {
         it('deve retornar erro ao buscar serviço inexistente', async () => {
             const response = await request(app)
                 .get('/api/services/999999')
-                .expect(404);
+                
+                .set('Authorization', `Bearer ${authToken}`).expect(404);
 
             expect(response.body.success).toBe(false);
         });
@@ -178,6 +218,7 @@ describe('Service Integration Tests', () => {
         beforeEach(async () => {
             const createResponse = await request(app)
                 .post('/api/services')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     name: 'Serviço Original',
                     description: 'Descrição original',
@@ -196,7 +237,8 @@ describe('Service Integration Tests', () => {
 
             const response = await request(app)
                 .put(`/api/services/${serviceId}`)
-                .send(updateData)
+                
+                .set('Authorization', `Bearer ${authToken}`).send(updateData)
                 .expect(200);
 
             expect(response.body.success).toBe(true);
@@ -212,7 +254,8 @@ describe('Service Integration Tests', () => {
 
             const response = await request(app)
                 .put(`/api/services/${serviceId}`)
-                .send(updateData)
+                
+                .set('Authorization', `Bearer ${authToken}`).send(updateData)
                 .expect(200);
 
             expect(response.body.success).toBe(true);
@@ -227,7 +270,8 @@ describe('Service Integration Tests', () => {
 
             const response = await request(app)
                 .put('/api/services/999999')
-                .send(updateData)
+                
+                .set('Authorization', `Bearer ${authToken}`).send(updateData)
                 .expect(404);
 
             expect(response.body.success).toBe(false);
@@ -240,6 +284,7 @@ describe('Service Integration Tests', () => {
         beforeEach(async () => {
             const createResponse = await request(app)
                 .post('/api/services')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({
                     name: 'Serviço para Deletar',
                     description: 'Descrição para teste',
@@ -252,7 +297,8 @@ describe('Service Integration Tests', () => {
         it('deve deletar um serviço existente', async () => {
             const response = await request(app)
                 .delete(`/api/services/${serviceId}`)
-                .expect(200);
+                
+                .set('Authorization', `Bearer ${authToken}`).expect(200);
 
             expect(response.body.success).toBe(true);
             expect(response.body.message).toContain('deletado com sucesso');
@@ -260,13 +306,15 @@ describe('Service Integration Tests', () => {
             // Verificar se realmente foi deletado
             await request(app)
                 .get(`/api/services/${serviceId}`)
-                .expect(404);
+                
+                .set('Authorization', `Bearer ${authToken}`).expect(404);
         });
 
         it('deve retornar erro ao deletar serviço inexistente', async () => {
             const response = await request(app)
                 .delete('/api/services/999999')
-                .expect(404);
+                
+                .set('Authorization', `Bearer ${authToken}`).expect(404);
 
             expect(response.body.success).toBe(false);
         });
@@ -295,7 +343,8 @@ describe('Service Integration Tests', () => {
             for (const service of services) {
                 const response = await request(app)
                     .post('/api/services')
-                    .send(service)
+                    
+                .set('Authorization', `Bearer ${authToken}`).send(service)
                     .expect(201);
 
                 expect(response.body.success).toBe(true);
@@ -312,7 +361,8 @@ describe('Service Integration Tests', () => {
 
             const response = await request(app)
                 .post('/api/services')
-                .send(serviceData)
+                
+                .set('Authorization', `Bearer ${authToken}`).send(serviceData)
                 .expect(201);
 
             expect(response.body.success).toBe(true);
@@ -331,7 +381,8 @@ describe('Service Integration Tests', () => {
 
             const createResponse = await request(app)
                 .post('/api/services')
-                .send(serviceData)
+                
+                .set('Authorization', `Bearer ${authToken}`).send(serviceData)
                 .expect(201);
 
             const serviceId = createResponse.body.data.id;
@@ -340,7 +391,8 @@ describe('Service Integration Tests', () => {
             // 2. Buscar serviço criado
             const getResponse = await request(app)
                 .get(`/api/services/${serviceId}`)
-                .expect(200);
+                
+                .set('Authorization', `Bearer ${authToken}`).expect(200);
 
             expect(getResponse.body.data.name).toBe(serviceData.name);
             expect(getResponse.body.data.price).toBe(serviceData.price);
@@ -354,7 +406,8 @@ describe('Service Integration Tests', () => {
             
             const updateResponse = await request(app)
                 .put(`/api/services/${serviceId}`)
-                .send(updateData)
+                
+                .set('Authorization', `Bearer ${authToken}`).send(updateData)
                 .expect(200);
 
             expect(updateResponse.body.data.name).toBe(updateData.name);
@@ -363,19 +416,22 @@ describe('Service Integration Tests', () => {
             // 4. Verificar atualização
             const getUpdatedResponse = await request(app)
                 .get(`/api/services/${serviceId}`)
-                .expect(200);
+                
+                .set('Authorization', `Bearer ${authToken}`).expect(200);
 
             expect(getUpdatedResponse.body.data.name).toBe(updateData.name);
 
             // 5. Deletar serviço
             await request(app)
                 .delete(`/api/services/${serviceId}`)
-                .expect(200);
+                
+                .set('Authorization', `Bearer ${authToken}`).expect(200);
 
             // 6. Verificar que foi deletado
             await request(app)
                 .get(`/api/services/${serviceId}`)
-                .expect(404);
+                
+                .set('Authorization', `Bearer ${authToken}`).expect(404);
         });
     });
 });
