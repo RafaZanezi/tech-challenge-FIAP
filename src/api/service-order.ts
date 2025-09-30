@@ -22,6 +22,11 @@ export class ServiceOrderAPI {
     routerServiceOrders.put('/service-orders/:id', serviceOrderController.update);
     routerServiceOrders.delete('/service-orders/:id', serviceOrderController.delete);
 
+    // Novos endpoints conforme requisitos
+    routerServiceOrders.get('/service-orders-active', serviceOrderController.findActiveWithOrdering);
+    routerServiceOrders.get('/service-orders/:id/status', serviceOrderController.getStatus);
+    routerServiceOrders.post('/service-orders/:id/external-approval', serviceOrderController.externalApproval);
+
     // Fluxo específico da ordem de serviço
     routerServiceOrders.patch('/service-orders/:id/start-diagnosis', serviceOrderController.startDiagnosis);
     routerServiceOrders.patch('/service-orders/:id/update-services-supplies', serviceOrderController.updateServicesAndSupplies);

@@ -25,7 +25,12 @@ export class ServiceOrderPresenter extends BasePresenter {
         }
       };
     } else {
-      const { id, clientId, vehicleId, services, supplies, status, createdAt, finalizedAt, totalServicePrice } = serviceOrder;
+      const { id, clientId, vehicleId, services, supplies, status, createdAt, finalizedAt } = serviceOrder;
+      
+      // Calculate totalServicePrice for DTO
+      const servicesTotal = services.reduce((total, service) => total + (service.price || 0), 0);
+      const suppliesTotal = supplies.reduce((total, supply) => total + (supply.price || 0), 0);
+      const totalServicePrice = servicesTotal + suppliesTotal;
       
       this.response = {
         success: true,
@@ -65,7 +70,12 @@ export class ServiceOrderPresenter extends BasePresenter {
             totalServicePrice,
           };
         } else {
-          const { id, clientId, vehicleId, services, supplies, status, createdAt, finalizedAt, totalServicePrice } = serviceOrder;
+          const { id, clientId, vehicleId, services, supplies, status, createdAt, finalizedAt } = serviceOrder;
+          
+          // Calculate totalServicePrice for DTO
+          const servicesTotal = services.reduce((total, service) => total + (service.price || 0), 0);
+          const suppliesTotal = supplies.reduce((total, supply) => total + (supply.price || 0), 0);
+          const totalServicePrice = servicesTotal + suppliesTotal;
           
           return {
             id,
@@ -81,5 +91,50 @@ export class ServiceOrderPresenter extends BasePresenter {
         }
       })
     };
+  }
+
+  presentUpdate(serviceOrder: ServiceOrder | ServiceOrderDTO): void {
+    this.statusCode = 200; // Use 200 for updates
+    
+    if (serviceOrder instanceof ServiceOrder) {
+      const { id, clientId, vehicleId, services, supplies, status, createdAt, finalizedAt, totalServicePrice } = serviceOrder;
+      
+      this.response = {
+        success: true,
+        data: {
+          id,
+          clientId,
+          vehicleId,
+          services: services.map(service => service.toJSON()),
+          supplies: supplies.map(supply => supply.toJSON()),
+          status,
+          createdAt,
+          finalizedAt,
+          totalServicePrice,
+        }
+      };
+    } else {
+      const { id, clientId, vehicleId, services, supplies, status, createdAt, finalizedAt } = serviceOrder;
+      
+      // Calculate totalServicePrice for DTO
+      const servicesTotal = services.reduce((total, service) => total + (service.price || 0), 0);
+      const suppliesTotal = supplies.reduce((total, supply) => total + (supply.price || 0), 0);
+      const totalServicePrice = servicesTotal + suppliesTotal;
+      
+      this.response = {
+        success: true,
+        data: {
+          id,
+          clientId,
+          vehicleId,
+          services,
+          supplies,
+          status,
+          createdAt,
+          finalizedAt,
+          totalServicePrice,
+        }
+      };
+    }
   }
 }

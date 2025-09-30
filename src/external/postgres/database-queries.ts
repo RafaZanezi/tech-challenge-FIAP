@@ -9,11 +9,10 @@ export class PostgresConnection {
 
     async findByParams<T>(table: string, fields: string[] | null, params: Record<string, any>): Promise<T> {
         const selectFields = fields ? fields.join(", ") : "*";
-        const whereClause = this.buildWhereClause(params);
-        const paramValues = Object.values(params);
+        const { clause, values } = this.buildWhereClause(params);
 
-        const query = `SELECT ${selectFields} FROM ${table} WHERE ${whereClause}`;
-        const result = await this.db.query(query, paramValues);
+        const query = `SELECT ${selectFields} FROM ${table} WHERE ${clause}`;
+        const result = await this.db.query(query, values);
         
         return result[0] as T;
     }
@@ -28,11 +27,10 @@ export class PostgresConnection {
 
     async findAllByParams<T>(table: string, fields: string[] | null, params: Record<string, any>): Promise<T[]> {
         const selectFields = fields ? fields.join(", ") : "*";
-        const whereClause = this.buildWhereClause(params);
-        const paramValues = Object.values(params);
+        const { clause, values } = this.buildWhereClause(params);
 
-        const query = `SELECT ${selectFields} FROM ${table} WHERE ${whereClause}`;
-        const result = await this.db.query(query, paramValues);
+        const query = `SELECT ${selectFields} FROM ${table} WHERE ${clause}`;
+        const result = await this.db.query(query, values);
 
         return result as T[];
     }
@@ -42,9 +40,12 @@ export class PostgresConnection {
 
         const keys = Object.keys(props as Record<string, any>);
         const values = Object.values(props as Record<string, any>);
+        
+        // Convert camelCase to snake_case for database columns
+        const dbKeys = keys.map(key => this.camelToSnake(key));
         const placeholders = keys.map((_, index) => `$${index + 1}`).join(", ");
 
-        const query = `INSERT INTO ${table} (${keys.join(", ")}) VALUES (${placeholders}) RETURNING *`;
+        const query = `INSERT INTO ${table} (${dbKeys.join(", ")}) VALUES (${placeholders}) RETURNING *`;
        
         const result = await this.db.query(query, values);
 
@@ -52,8 +53,12 @@ export class PostgresConnection {
     }
 
     async update<T>(table: string, id: number, data: Partial<T>): Promise<T> {
-        const setClause = this.buildSetClause(data as Record<string, any>);
+        const keys = Object.keys(data as Record<string, any>);
         const values = Object.values(data as Record<string, any>);
+        
+        // Convert camelCase to snake_case for database columns
+        const dbKeys = keys.map(key => this.camelToSnake(key));
+        const setClause = dbKeys.map((key, index) => `${key} = $${index + 1}`).join(", ");
 
         const query = `UPDATE ${table} SET ${setClause} WHERE id = $${values.length + 1} RETURNING *`;
         const result = await this.db.query(query, [...values, id]);
@@ -66,15 +71,44 @@ export class PostgresConnection {
         await this.db.query(query, [id]);
     }
 
-    private buildWhereClause(params: Record<string, any>): string {
-        return Object.keys(params)
-            .map((key, index) => `${key} = $${index + 1}`)
-            .join(" AND ");
+    async customQuery<T>(query: string, params: any[] = []): Promise<T> {
+        const result = await this.db.query(query, params);
+        return result as T;
+    }
+
+    private buildWhereClause(params: Record<string, any>): { clause: string; values: any[] } {
+        const conditions: string[] = [];
+        const values: any[] = [];
+        let paramIndex = 1;
+
+        Object.keys(params).forEach(key => {
+            const dbKey = this.camelToSnake(key);
+            const value = params[key];
+            
+            if (Array.isArray(value)) {
+                // Handle IN clause for arrays
+                const placeholders = value.map(() => `$${paramIndex++}`).join(', ');
+                conditions.push(`${dbKey} IN (${placeholders})`);
+                values.push(...value);
+            } else {
+                conditions.push(`${dbKey} = $${paramIndex++}`);
+                values.push(value);
+            }
+        });
+
+        return {
+            clause: conditions.join(" AND "),
+            values
+        };
     }
 
     private buildSetClause(data: Record<string, any>): string {
         return Object.keys(data)
             .map((key, index) => `${key} = $${index + 1}`)
             .join(", ");
+    }
+
+    private camelToSnake(str: string): string {
+        return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
     }
 }

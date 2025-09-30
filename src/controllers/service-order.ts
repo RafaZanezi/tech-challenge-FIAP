@@ -1,7 +1,9 @@
 import { ServiceOrderDTO } from "../dtos/service-order";
 import { ServiceOrderGateway } from "../gateways/service-order";
+import { ClientGateway } from "../gateways/client";
+import { VehicleGateway } from "../gateways/vehicle";
 import { DatabaseConnection } from "../interfaces/connection";
-import { ServiceOrderGatewayInterface } from "../interfaces/gateways";
+import { ServiceOrderGatewayInterface, ClientGatewayInterface, VehicleGatewayInterface } from "../interfaces/gateways";
 import { ServiceOrderPresenter } from "../presenters/service-order";
 import { verifyAndReturnError } from "../presenters/verify-and-return-error";
 import { ServiceOrderUseCases } from "../usecases/service-order";
@@ -10,12 +12,20 @@ export class ServiceOrderController {
 
   private dbConnection: DatabaseConnection;
   private serviceOrderGateway: ServiceOrderGatewayInterface;
+  private clientGateway: ClientGatewayInterface;
+  private vehicleGateway: VehicleGatewayInterface;
   private serviceOrderUseCase: ServiceOrderUseCases;
 
   constructor(dbConnection: DatabaseConnection) {
     this.dbConnection = dbConnection;
     this.serviceOrderGateway = new ServiceOrderGateway(this.dbConnection);
-    this.serviceOrderUseCase = new ServiceOrderUseCases(this.serviceOrderGateway);
+    this.clientGateway = new ClientGateway(this.dbConnection);
+    this.vehicleGateway = new VehicleGateway(this.dbConnection);
+    this.serviceOrderUseCase = new ServiceOrderUseCases(
+      this.serviceOrderGateway, 
+      this.clientGateway, 
+      this.vehicleGateway
+    );
   }
 
   public create = async (req, res) => {
@@ -72,6 +82,53 @@ export class ServiceOrderController {
     }
   }
 
+  public findActiveWithOrdering = async (req, res) => {
+    try {
+      const response = await this.serviceOrderUseCase.findActiveServiceOrdersWithOrdering();
+
+      const presenter = new ServiceOrderPresenter();
+      presenter.presentList(response);
+      res.status(presenter.getStatusCode()).send(presenter.getResponse());
+    } catch (error) {
+      verifyAndReturnError(error, res);
+    }
+  }
+
+  public getStatus = async (req, res) => {
+    try {
+      const serviceOrderId = parseInt(req.params.id);
+      const response = await this.serviceOrderUseCase.getServiceOrderStatus(serviceOrderId);
+
+      res.status(200).json(response);
+    } catch (error) {
+      verifyAndReturnError(error, res);
+    }
+  }
+
+  public externalApproval = async (req, res) => {
+    try {
+      const serviceOrderId = parseInt(req.params.id);
+      const { approved } = req.body;
+
+      if (typeof approved !== 'boolean') {
+        return res.status(400).json({ 
+          error: 'O campo "approved" é obrigatório e deve ser um booleano' 
+        });
+      }
+
+      const response = await this.serviceOrderUseCase.approveOrderFromExternal(
+        serviceOrderId, 
+        approved
+      );
+
+      const presenter = new ServiceOrderPresenter();
+      presenter.presentUpdate(response); // Use presentUpdate instead of present
+      res.status(presenter.getStatusCode()).send(presenter.getResponse());
+    } catch (error) {
+      verifyAndReturnError(error, res);
+    }
+  }
+
   public delete = async (req, res) => {
     try {
       const serviceOrderId = parseInt(req.params.id);
@@ -93,7 +150,7 @@ export class ServiceOrderController {
 
       const presenter = new ServiceOrderPresenter();
 
-      presenter.present(response);
+      presenter.presentUpdate(response);
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
       verifyAndReturnError(error, res);
@@ -127,7 +184,7 @@ export class ServiceOrderController {
 
       const presenter = new ServiceOrderPresenter();
 
-      presenter.present(response);
+      presenter.presentUpdate(response);
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
       verifyAndReturnError(error, res);
@@ -155,7 +212,7 @@ export class ServiceOrderController {
 
       const presenter = new ServiceOrderPresenter();
 
-      presenter.present(response);
+      presenter.presentUpdate(response);
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
       verifyAndReturnError(error, res);
@@ -169,7 +226,7 @@ export class ServiceOrderController {
 
       const presenter = new ServiceOrderPresenter();
 
-      presenter.present(response);
+      presenter.presentUpdate(response);
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
       verifyAndReturnError(error, res);
@@ -183,7 +240,7 @@ export class ServiceOrderController {
 
       const presenter = new ServiceOrderPresenter();
 
-      presenter.present(response);
+      presenter.presentUpdate(response);
       res.status(presenter.getStatusCode()).send(presenter.getResponse());
     } catch (error) {
       verifyAndReturnError(error, res);

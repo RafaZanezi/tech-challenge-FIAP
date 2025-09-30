@@ -4,11 +4,15 @@ import { Service } from "../entities/service";
 import { ServiceOrder } from "../entities/service-order";
 import { Supply } from "../entities/supply";
 import { ServiceOrderStatus } from "../interfaces/enums/service-order-status.enum";
-import { ServiceOrderGatewayInterface } from "../interfaces/gateways";
-import { ConflictError } from "./errors/errors";
+import { ServiceOrderGatewayInterface, ClientGatewayInterface, VehicleGatewayInterface } from "../interfaces/gateways";
+import { ConflictError, ValidationError } from "./errors/errors";
 
 export class ServiceOrderUseCases {
-  constructor(private serviceOrderGateway: ServiceOrderGatewayInterface) { }
+  constructor(
+    private serviceOrderGateway: ServiceOrderGatewayInterface,
+    private clientGateway: ClientGatewayInterface,
+    private vehicleGateway: VehicleGatewayInterface
+  ) { }
 
   async createServiceOrder(data: {
     clientId: number;
@@ -17,6 +21,18 @@ export class ServiceOrderUseCases {
     supplies?: Supply[];
   }): Promise<ServiceOrder> {
     
+    // Verificar se o cliente existe
+    const client = await this.clientGateway.findById(data.clientId);
+    if (!client) {
+      throw new ValidationError('Cliente não encontrado');
+    }
+
+    // Verificar se o veículo existe
+    const vehicle = await this.vehicleGateway.findById(data.vehicleId);
+    if (!vehicle) {
+      throw new ValidationError('Veículo não encontrado');
+    }
+
     // Verificar se já existe uma OS aberta para este cliente e veículo
     const existingOS = await this.serviceOrderGateway.findOpenOSByCarAndClient(
       data.vehicleId, 
@@ -34,8 +50,7 @@ export class ServiceOrderUseCases {
       supplies: data.supplies || [],
       createdAt: new Date(),
       finalizedAt: null,
-      status: ServiceOrderStatus.RECEIVED,
-      totalServicePrice: this.calculateTotalPrice(data.services, data.supplies || [])
+      status: ServiceOrderStatus.RECEIVED
     });
 
     const savedServiceOrderDTO = await this.serviceOrderGateway.create(serviceOrder);
@@ -55,6 +70,43 @@ export class ServiceOrderUseCases {
   async findAllServiceOrders(): Promise<ServiceOrder[]> {
     const serviceOrdersDTO = await this.serviceOrderGateway.findAll();
     return serviceOrdersDTO.map(serviceOrderDTO => ServiceOrderAdapter.adapt(serviceOrderDTO));
+  }
+
+  async findActiveServiceOrdersWithOrdering(): Promise<ServiceOrder[]> {
+    const serviceOrdersDTO = await this.serviceOrderGateway.findAllActiveWithOrdering();
+    return serviceOrdersDTO.map(serviceOrderDTO => ServiceOrderAdapter.adapt(serviceOrderDTO));
+  }
+
+  async getServiceOrderStatus(id: number): Promise<{ id: number; status: string }> {
+    const serviceOrderDTO = await this.serviceOrderGateway.findById(id);
+
+    if (!serviceOrderDTO) {
+      throw new NotFoundHttpError('Ordem de serviço');
+    }
+
+    return {
+      id: serviceOrderDTO.id,
+      status: serviceOrderDTO.status
+    };
+  }
+
+  async approveOrderFromExternal(id: number, approved: boolean): Promise<ServiceOrder> {
+    const serviceOrderDTO = await this.serviceOrderGateway.findById(id);
+
+    if (!serviceOrderDTO) {
+      throw new NotFoundHttpError('Ordem de serviço');
+    }
+
+    const serviceOrder = ServiceOrderAdapter.adapt(serviceOrderDTO);
+    
+    if (approved) {
+      serviceOrder.approveOrder();
+    } else {
+      serviceOrder.rejectOrder();
+    }
+
+    const updatedServiceOrderDTO = await this.serviceOrderGateway.update(id, serviceOrder);
+    return ServiceOrderAdapter.adapt(updatedServiceOrderDTO);
   }
 
   async updateServiceOrder(id: number, data: Partial<ServiceOrder>): Promise<ServiceOrder> {

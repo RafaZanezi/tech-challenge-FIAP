@@ -10,5 +10,4 @@ export interface ServiceOrderDTO {
     createdAt: Date;
     finalizedAt: Date | null;
     status: string;
-    totalServicePrice: number;
 }

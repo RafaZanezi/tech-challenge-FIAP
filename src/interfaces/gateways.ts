@@ -59,6 +59,7 @@ interface VehicleGatewayInterface {
 
 interface ServiceOrderGatewayInterface {
     findAll(): Promise<ServiceOrderDTO[]>;
+    findAllActiveWithOrdering(): Promise<ServiceOrderDTO[]>;
     findById(id: number): Promise<ServiceOrderDTO | null>;
     findOpenOSByCarAndClient(carId: number, clientId: number): Promise<ServiceOrderDTO | null>;
     create(data: ServiceOrder): Promise<ServiceOrderDTO>;

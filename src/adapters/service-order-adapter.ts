@@ -21,8 +21,7 @@ export class ServiceOrderAdapter {
       }, supplyDTO.id)),
       createdAt: serviceOrderDTO.createdAt,
       finalizedAt: serviceOrderDTO.finalizedAt,
-      status: serviceOrderDTO.status as ServiceOrderStatus,
-      totalServicePrice: serviceOrderDTO.totalServicePrice
+      status: serviceOrderDTO.status as ServiceOrderStatus
     }, serviceOrderDTO.id);
   }
 }

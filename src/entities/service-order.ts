@@ -12,7 +12,6 @@ export interface ServiceOrderProps {
     createdAt: Date;
     finalizedAt: Date | null;
     status: ServiceOrderStatus;
-    totalServicePrice: number;
 }
 
 export class ServiceOrder extends Entity<number> {
@@ -46,7 +45,9 @@ export class ServiceOrder extends Entity<number> {
     }
 
     get totalServicePrice(): number {
-        return this.props.totalServicePrice;
+        const servicesTotal = this.props.services.reduce((total, service) => total + (service.price || 0), 0);
+        const suppliesTotal = this.props.supplies.reduce((total, supply) => total + (supply.price || 0), 0);
+        return servicesTotal + suppliesTotal;
     }
 
     private readonly props: ServiceOrderProps;
@@ -124,6 +125,16 @@ export class ServiceOrder extends Entity<number> {
 
     public cancelOrder() {
         this.props.status = ServiceOrderStatus.CANCELLED;
+        this.props.finalizedAt = new Date();
+    }
+
+    public rejectOrder() {
+        if (this.props.status !== ServiceOrderStatus.WAITING_FOR_APPROVAL) {
+            throw new ValidationError('A ordem de serviço deve estar aguardando aprovação para ser rejeitada');
+        }
+
+        this.props.status = ServiceOrderStatus.CANCELLED;
+        this.props.finalizedAt = new Date();
     }
 
     public toJSON() {
