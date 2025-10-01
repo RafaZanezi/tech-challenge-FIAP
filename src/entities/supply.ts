@@ -62,6 +62,14 @@ export class Supply extends Entity<number> {
     };
   }
 
+  public toDatabase() {
+    return {
+      name: this.props.name,
+      quantity: this.props.quantity,
+      price: this.props.price
+    };
+  }
+
   private validate(props: SupplyProps): void {
     if (!props.name || props.name.trim().length === 0) {
       throw new ValidationError('Nome do insumo é obrigatório');

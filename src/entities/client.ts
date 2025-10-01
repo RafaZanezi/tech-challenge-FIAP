@@ -48,6 +48,13 @@ export class Client extends Entity<number> {
         };
     }
 
+    public toDatabase() {
+        return {
+            name: this.props.name,
+            identifier: this.props.identifier
+        };
+    }
+
     private validate(props: ClientProps): void {
         if (!props.name || props.name.trim().length === 0) {
             throw new ValidationError('Nome do cliente é obrigatório');

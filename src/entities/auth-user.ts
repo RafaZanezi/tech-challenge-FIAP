@@ -53,6 +53,14 @@ export class User extends Entity<number> {
         };
     }
 
+    public toDatabase() {
+        return {
+            name: this.props.name,
+            password: this.props.password,
+            role: this.props.role
+        };
+    }
+
     private validate(props: UserProps): void {
         if (!props.name || props.name.trim().length === 0) {
             throw new ValidationError('Nome do usuário é obrigatório');

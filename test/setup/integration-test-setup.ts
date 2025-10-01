@@ -20,7 +20,7 @@ export class TestDatabaseConnection extends PostgresDatabaseConnection {
     async query<T = any>(text: string, params?: any[]): Promise<T> {
         try {
             const result = await this.testPool.query(text, params);
-            return result.rows as T;
+            return result as T;
         } catch (error) {
             console.error('Erro ao executar query no teste:', error);
             throw error;

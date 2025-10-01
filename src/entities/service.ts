@@ -62,6 +62,14 @@ export class Service extends Entity<number> {
     };
   }
 
+  public toDatabase() {
+    return {
+      name: this.props.name,
+      description: this.props.description,
+      price: this.props.price
+    };
+  }
+
   private validate(props: ServiceProps): void {
     if (!props.name || props.name.trim().length === 0) {
       throw new ValidationError('Nome do serviço é obrigatório');

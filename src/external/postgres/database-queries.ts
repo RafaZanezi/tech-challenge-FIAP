@@ -14,7 +14,7 @@ export class PostgresConnection {
         const query = `SELECT ${selectFields} FROM ${table} WHERE ${clause}`;
         const result = await this.db.query(query, values);
         
-        return result[0] as T;
+        return result.rows[0] as T;
     }
 
     async findAll<T>(table: string, fields: string[] | null): Promise<T> {
@@ -22,7 +22,7 @@ export class PostgresConnection {
         const query = `SELECT ${selectFields} FROM ${table}`;
         const result = await this.db.query(query);
 
-        return result as T;
+        return result.rows as T;
     }
 
     async findAllByParams<T>(table: string, fields: string[] | null, params: Record<string, any>): Promise<T[]> {
@@ -32,14 +32,15 @@ export class PostgresConnection {
         const query = `SELECT ${selectFields} FROM ${table} WHERE ${clause}`;
         const result = await this.db.query(query, values);
 
-        return result as T[];
+        return result.rows as T[];
     }
 
-    async insert<T>(table: string, data: T): Promise<T> {
-        const { props } = data as any;
-
-        const keys = Object.keys(props as Record<string, any>);
-        const values = Object.values(props as Record<string, any>);
+    async insert<T>(table: string, data: any): Promise<T> {
+        // Handle entity objects with toDatabase method, otherwise use the object directly
+        const dataToInsert = data.toDatabase ? data.toDatabase() : data;
+        
+        const keys = Object.keys(dataToInsert);
+        const values = Object.values(dataToInsert);
         
         // Convert camelCase to snake_case for database columns
         const dbKeys = keys.map(key => this.camelToSnake(key));
@@ -49,7 +50,7 @@ export class PostgresConnection {
        
         const result = await this.db.query(query, values);
 
-        return result[0] as T;
+        return result.rows[0] as T;
     }
 
     async update<T>(table: string, id: number, data: Partial<T>): Promise<T> {
@@ -63,7 +64,7 @@ export class PostgresConnection {
         const query = `UPDATE ${table} SET ${setClause} WHERE id = $${values.length + 1} RETURNING *`;
         const result = await this.db.query(query, [...values, id]);
 
-        return result[0] as T;
+        return result.rows[0] as T;
     }
 
     async delete(table: string, id: number): Promise<void> {
@@ -73,7 +74,7 @@ export class PostgresConnection {
 
     async customQuery<T>(query: string, params: any[] = []): Promise<T> {
         const result = await this.db.query(query, params);
-        return result as T;
+        return result.rows as T;
     }
 
     private buildWhereClause(params: Record<string, any>): { clause: string; values: any[] } {
@@ -100,12 +101,6 @@ export class PostgresConnection {
             clause: conditions.join(" AND "),
             values
         };
-    }
-
-    private buildSetClause(data: Record<string, any>): string {
-        return Object.keys(data)
-            .map((key, index) => `${key} = $${index + 1}`)
-            .join(", ");
     }
 
     private camelToSnake(str: string): string {

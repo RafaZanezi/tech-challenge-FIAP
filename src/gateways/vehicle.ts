@@ -75,7 +75,7 @@ export class VehicleGateway implements VehicleGatewayInterface {
             client_id: entity.clientId
         };
         
-        const result = await this.queries.insert(this.tableName, { props: dbData } as any);
+        const result = await this.queries.insert(this.tableName, dbData) as any;
         
         // Mapear snake_case de volta para camelCase
         return {

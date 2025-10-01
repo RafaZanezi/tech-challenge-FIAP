@@ -91,7 +91,7 @@ export class ServiceOrderGateway implements ServiceOrderGatewayInterface {
 
     async create(entity: ServiceOrder): Promise<ServiceOrderDTO> {
         const dbData = this.mapEntityToDb(entity);
-        const result = await this.queries.insert<any>(this.tableName, { props: dbData });
+        const result = await this.queries.insert<any>(this.tableName, dbData);
         return this.mapDbToDto(result);
     }
 

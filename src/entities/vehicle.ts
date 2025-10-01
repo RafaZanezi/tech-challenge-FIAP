@@ -91,6 +91,16 @@ export class Vehicle extends Entity<number> {
         };
     }
 
+    public toDatabase() {
+        return {
+            brand: this.props.brand,
+            model: this.props.model,
+            year: this.props.year,
+            licensePlate: this.props.licensePlate,
+            clientId: this.props.clientId
+        };
+    }
+
     private validate(props: VehicleProps): void {
         if (!props.brand || props.brand.trim().length === 0) {
             throw new ValidationError('Marca do veículo é obrigatória');

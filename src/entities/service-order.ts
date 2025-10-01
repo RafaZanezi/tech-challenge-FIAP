@@ -150,6 +150,18 @@ export class ServiceOrder extends Entity<number> {
         };
     }
 
+    public toDatabase() {
+        return {
+            clientId: this.props.clientId,
+            vehicleId: this.props.vehicleId,
+            services: this.props.services,
+            supplies: this.props.supplies,
+            createdAt: this.props.createdAt,
+            finalizedAt: this.props.finalizedAt,
+            status: this.props.status
+        };
+    }
+
     private validate(props: ServiceOrderProps): void {
         if (!props.clientId) {
             throw new ValidationError('ID do cliente é obrigatório');

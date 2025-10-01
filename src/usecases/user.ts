@@ -31,7 +31,7 @@ export class UserUseCases {
 
         // Salvar no banco
         const savedUserDTO = await this.userGateway.insert(user);
-
+        
         // Criar instância do usuário com ID
         const newUser = new User({
             name: savedUserDTO.name,
