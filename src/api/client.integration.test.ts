@@ -39,8 +39,7 @@ describe('Cliente Integration Tests', () => {
         // Create admin user and get token
         const registerResponse = await request(app)
             .post('/api/auth/register')
-            
-                .set('Authorization', `Bearer ${authToken}`).send({
+            .send({
                 name: 'TestAdmin',
                 password: 'password123',
                 role: 'admin'

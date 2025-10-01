@@ -2,6 +2,39 @@ import { BadRequestError, ConflictHttpError, ForbiddenError, HttpError, Internal
 
 
 describe('HTTP Errors', () => {
+  describe('HttpError (abstract base class)', () => {
+    class TestHttpError extends HttpError {
+      constructor(message: string, statusCode: number) {
+        super(message, statusCode);
+      }
+    }
+
+    it('should create an error with correct properties', () => {
+      const error = new TestHttpError('Test error', 400);
+
+      expect(error.message).toBe('Test error');
+      expect(error.statusCode).toBe(400);
+      expect(error.isOperational).toBe(true);
+      expect(error.name).toBe('TestHttpError');
+    });
+
+    it('should have stack trace captured', () => {
+      const error = new TestHttpError('Test error', 400);
+      expect(error.stack).toBeDefined();
+    });
+
+    it('should return correct JSON representation', () => {
+      const error = new TestHttpError('Test error', 400);
+      const json = error.toJSON();
+
+      expect(json.name).toBe('TestHttpError');
+      expect(json.message).toBe('Test error');
+      expect(json.statusCode).toBe(400);
+      expect(json.timestamp).toBeDefined();
+      expect(new Date(json.timestamp).getTime()).not.toBeNaN();
+    });
+  });
+
   describe('BadRequestError', () => {
     it('should create with default message', () => {
       const error = new BadRequestError();

@@ -18,4 +18,9 @@ module.exports = {
       tsconfig: 'tsconfig.json',
     }],
   },
+  // Configurações para testes de integração
+  maxWorkers: 1, // Força execução sequencial para testes de integração
+  testTimeout: 30000,
+  detectOpenHandles: true,
+  forceExit: true
 };
