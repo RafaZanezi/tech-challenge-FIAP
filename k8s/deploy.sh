@@ -24,6 +24,18 @@ echo "🔧 Applying configuration..."
 kubectl apply -f k8s/configmap.yaml
 kubectl apply -f k8s/secret.yaml
 
+# Check for existing deployments and delete them if they exist (to handle selector immutability)
+echo "🔧 Checking for existing deployments..."
+if kubectl get deployment postgres-deployment -n $NAMESPACE >/dev/null 2>&1; then
+    echo "🗑️  Deleting existing postgres-deployment to update selectors..."
+    kubectl delete deployment postgres-deployment -n $NAMESPACE
+fi
+
+if kubectl get deployment workshop-app-deployment -n $NAMESPACE >/dev/null 2>&1; then
+    echo "🗑️  Deleting existing workshop-app-deployment to update selectors..."
+    kubectl delete deployment workshop-app-deployment -n $NAMESPACE
+fi
+
 # Deploy PostgreSQL (for development/testing)
 echo "🐘 Deploying PostgreSQL..."
 kubectl apply -f k8s/postgres.yaml

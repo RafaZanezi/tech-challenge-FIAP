@@ -18,6 +18,7 @@ spec:
       containers:
       - name: workshop-app
         image: workshop-app:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 3000
           name: http
@@ -124,8 +125,5 @@ spec:
             drop:
             - ALL
             
-      # Image pull policy
-      imagePullPolicy: Always
-      
       # Restart policy
       restartPolicy: Always

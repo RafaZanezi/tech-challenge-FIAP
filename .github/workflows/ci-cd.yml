@@ -326,6 +326,15 @@ jobs:
     
     - name: Deploy Application
       run: |
+        # Handle selector immutability by deleting existing deployments first
+        echo "🔧 Checking for existing deployments..."
+        kubectl delete deployment postgres-deployment -n workshop-app --ignore-not-found=true
+        kubectl delete deployment workshop-app-deployment -n workshop-app --ignore-not-found=true
+        
+        # Wait a moment for resources to be fully deleted
+        sleep 5
+        
+        # Apply all resources using kustomize
         kubectl apply -k k8s/
         kubectl rollout status deployment/workshop-app-deployment -n workshop-app --timeout=300s
     
@@ -390,6 +399,15 @@ jobs:
     
     - name: Deploy Application to Production
       run: |
+        # Handle selector immutability by deleting existing deployments first
+        echo "🔧 Checking for existing deployments..."
+        kubectl delete deployment postgres-deployment -n workshop-app --ignore-not-found=true
+        kubectl delete deployment workshop-app-deployment -n workshop-app --ignore-not-found=true
+        
+        # Wait a moment for resources to be fully deleted
+        sleep 5
+        
+        # Apply all resources using kustomize
         kubectl apply -k k8s/
         kubectl rollout status deployment/workshop-app-deployment -n workshop-app --timeout=600s
     
