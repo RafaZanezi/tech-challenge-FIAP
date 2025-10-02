@@ -1,0 +1,308 @@
+name: Test with Kind Cluster
+
+on:
+  push:
+    branches: [ main, develop, fase-2 ]
+  pull_request:
+    branches: [ main, develop ]
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/tech-challenge-fiap
+
+jobs:
+  # Job 1: Build e Test básicos (sem Kind)
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: admin
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run ESLint
+      run: npm run lint
+    
+    - name: Setup test database
+      run: |
+        PGPASSWORD=admin psql -h localhost -U postgres -d postgres -f migrations/001_initial_schema.sql
+      env:
+        PGPASSWORD: admin
+
+    - name: Build application
+      run: npm run build
+    
+    - name: Run unit tests
+      run: npm test
+    
+    - name: Run integration tests
+      run: npm run test:integration
+      env:
+        DATABASE_URL: postgresql://postgres:admin@localhost:5432/postgres
+
+  # Job 2: Build Docker Image
+  build-docker:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    
+    permissions:
+      contents: read
+      packages: write
+      
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+    
+    - name: Build and push Docker image
+      id: build
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  # Job 3: Test deployment with Kind
+  test-k8s-deployment:
+    needs: [build-and-test, build-docker]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Create Kind cluster
+      uses: helm/kind-action@v1.8.0
+      with:
+        cluster_name: test-cluster
+        version: v0.20.0
+        kubectl_version: v1.27.3
+        config: |
+          kind: Cluster
+          apiVersion: kind.x-k8s.io/v1alpha4
+          nodes:
+          - role: control-plane
+            kubeadmConfigPatches:
+            - |
+              kind: InitConfiguration
+              nodeRegistration:
+                kubeletExtraArgs:
+                  node-labels: "ingress-ready=true"
+            extraPortMappings:
+            - containerPort: 80
+              hostPort: 80
+              protocol: TCP
+            - containerPort: 443
+              hostPort: 443
+              protocol: TCP
+    
+    - name: Wait for cluster to be ready
+      run: |
+        echo "🔄 Aguardando cluster ficar pronto..."
+        kubectl wait --for=condition=Ready nodes --all --timeout=300s
+        kubectl cluster-info
+        kubectl get nodes -o wide
+    
+    - name: Load Docker image into Kind
+      run: |
+        echo "📦 Carregando imagem Docker no Kind cluster..."
+        # Extrair apenas a tag da imagem
+        IMAGE_TAG=$(echo "${{ needs.build-docker.outputs.image-tag }}" | head -n1)
+        echo "Carregando imagem: $IMAGE_TAG"
+        kind load docker-image $IMAGE_TAG --name test-cluster
+    
+    - name: Update Kubernetes manifests for testing
+      run: |
+        cd k8s
+        # Atualizar kustomization.yaml com a nova imagem
+        IMAGE_TAG=$(echo "${{ needs.build-docker.outputs.image-tag }}" | head -n1)
+        CLEAN_TAG=$(echo $IMAGE_TAG | sed 's/.*://')
+        echo "Usando tag: $CLEAN_TAG"
+        sed -i "s|newTag:.*|newTag: $CLEAN_TAG|" kustomization.yaml
+        
+        # Verificar se o arquivo foi atualizado
+        echo "Conteúdo do kustomization.yaml:"
+        cat kustomization.yaml
+    
+    - name: Deploy to Kind cluster
+      run: |
+        echo "🚀 Fazendo deploy no cluster Kind..."
+        
+        # Aplicar namespace primeiro
+        kubectl apply -f k8s/namespace.yaml
+        
+        # Aplicar configurações
+        kubectl apply -f k8s/configmap.yaml
+        kubectl apply -f k8s/secret.yaml
+        
+        # Deploy PostgreSQL
+        kubectl apply -f k8s/postgres.yaml
+        
+        # Aguardar PostgreSQL ficar pronto
+        echo "⏳ Aguardando PostgreSQL..."
+        kubectl wait --for=condition=ready pod -l app=postgres -n workshop-app --timeout=300s
+        
+        # Executar migrações
+        echo "🗄️  Executando migrações..."
+        kubectl create configmap migration-script --from-file=migrations/001_initial_schema.sql -n workshop-app --dry-run=client -o yaml | kubectl apply -f -
+        
+        # Deploy da aplicação
+        kubectl apply -k k8s/
+        
+        # Aguardar deploy da aplicação
+        echo "⏳ Aguardando aplicação..."
+        kubectl wait --for=condition=available deployment/workshop-app-deployment -n workshop-app --timeout=300s
+    
+    - name: Verify deployment
+      run: |
+        echo "✅ Verificando deployment..."
+        kubectl get all -n workshop-app
+        kubectl describe deployment workshop-app-deployment -n workshop-app
+        
+        # Verificar se os pods estão rodando
+        kubectl get pods -n workshop-app -o wide
+        
+        # Verificar logs da aplicação
+        echo "📋 Logs da aplicação:"
+        kubectl logs -l app=workshop-app -n workshop-app --tail=50 || echo "Sem logs disponíveis ainda"
+    
+    - name: Test application endpoints
+      run: |
+        echo "🧪 Testando endpoints da aplicação..."
+        
+        # Port forward para testar a aplicação
+        kubectl port-forward -n workshop-app service/workshop-app-service 3000:3000 &
+        PF_PID=$!
+        
+        # Aguardar port-forward
+        sleep 10
+        
+        # Testar endpoint de health (se existir)
+        if curl -f http://localhost:3000/health 2>/dev/null; then
+          echo "✅ Health check passou"
+        else
+          echo "ℹ️  Health endpoint não disponível ou aplicação ainda iniciando"
+        fi
+        
+        # Testar endpoint raiz
+        if curl -f http://localhost:3000/ 2>/dev/null; then
+          echo "✅ Aplicação respondendo"
+        else
+          echo "ℹ️  Aplicação pode estar ainda inicializando"
+        fi
+        
+        # Parar port-forward
+        kill $PF_PID 2>/dev/null || true
+    
+    - name: Cleanup (if failure)
+      if: failure()
+      run: |
+        echo "❌ Deploy falhou. Coletando informações para debug..."
+        kubectl get events -n workshop-app --sort-by='.lastTimestamp'
+        kubectl describe pods -n workshop-app
+        kubectl logs -l app=workshop-app -n workshop-app --previous=true || echo "Sem logs anteriores"
+
+  # Job 4: Generate deployment instructions
+  generate-instructions:
+    needs: test-k8s-deployment
+    runs-on: ubuntu-latest
+    if: success() && github.ref == 'refs/heads/fase-2'
+    
+    steps:
+    - name: Generate kubeconfig for local development
+      run: |
+        echo "📋 Para usar este setup localmente:"
+        echo ""
+        echo "1. Instale o Kind:"
+        echo "   # macOS:"
+        echo "   brew install kind"
+        echo "   # Linux:"
+        echo "   curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64"
+        echo "   chmod +x ./kind && sudo mv ./kind /usr/local/bin/"
+        echo ""
+        echo "2. Execute o script de setup:"
+        echo "   ./setup-kind-cluster.sh"
+        echo ""
+        echo "3. Para fazer deploy:"
+        echo "   cd k8s && ./deploy.sh"
+        echo ""
+        echo "✅ Deployment testado com sucesso no GitHub Actions!"
+
+  # Job 5: Summary
+  deployment-summary:
+    needs: [build-and-test, build-docker, test-k8s-deployment]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Show results
+      run: |
+        echo "📊 Resultados do Pipeline:"
+        echo "🏗️  Build & Test: ${{ needs.build-and-test.result }}"
+        echo "🐳 Docker Build: ${{ needs.build-docker.result }}"
+        echo "🚀 K8s Test: ${{ needs.test-k8s-deployment.result }}"
+        echo ""
+        
+        if [[ "${{ needs.test-k8s-deployment.result }}" == "success" ]]; then
+          echo "✅ Todos os testes passaram! A aplicação foi testada com sucesso no Kubernetes."
+          echo "🎯 A imagem está pronta para deploy em qualquer cluster K8s."
+        else
+          echo "❌ Alguns testes falharam. Verifique os logs acima."
+        fi

@@ -40,9 +40,16 @@ if ! command -v kubectl &> /dev/null; then
     exit 1
 fi
 
+# 3. Verificar se cluster já existe
+if kind get clusters | grep -q "dev-cluster"; then
+    echo "ℹ️  Cluster 'dev-cluster' já existe"
+    echo "🔄 Recriando cluster para garantir configuração limpa..."
+    kind delete cluster --name dev-cluster
+fi
+
 # 3. Criar cluster Kind
 echo "🔧 Criando cluster Kind..."
-kind create cluster --name workshop-cluster --config - <<EOF
+kind create cluster --name dev-cluster --config - <<EOF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
@@ -62,15 +69,19 @@ nodes:
     protocol: TCP
 EOF
 
-# 4. Verificar se cluster está rodando
-echo "✅ Verificando cluster..."
-kubectl cluster-info --context kind-workshop-cluster
+# 4. Aguardar cluster ficar pronto
+echo "⏳ Aguardando cluster ficar pronto..."
+kubectl wait --for=condition=Ready nodes --all --timeout=300s --context kind-dev-cluster
 
-# 5. Gerar kubeconfig para GitHub Secrets
+# 5. Verificar se cluster está rodando
+echo "✅ Verificando cluster..."
+kubectl cluster-info --context kind-dev-cluster
+
+# 6. Gerar kubeconfig para GitHub Secrets
 echo ""
 echo "📋 Para configurar o GitHub Actions, use este kubeconfig:"
 echo "---"
-kubectl config view --raw --context kind-workshop-cluster | base64 | tr -d '\n'
+kubectl config view --raw --context kind-dev-cluster | base64 | tr -d '\n'
 echo ""
 echo "---"
 echo ""
