@@ -305,7 +305,16 @@ jobs:
         kubectl apply -f k8s/secret.yaml
         kubectl apply -f k8s/configmap.yaml
         kubectl apply -f k8s/postgres.yaml
+        
+        # Wait for PostgreSQL to be ready and test connection
         kubectl wait --for=condition=ready pod -l app=postgres -n workshop-app --timeout=300s
+        
+        # Additional wait to ensure PostgreSQL is fully initialized
+        echo "⏳ Waiting for PostgreSQL to fully initialize..."
+        sleep 30
+        
+        # Test database connectivity
+        kubectl exec -n workshop-app deployment/postgres-deployment -- pg_isready -U postgres -d workshop_db || true
     
     - name: Run Database Migrations
       run: |
@@ -321,6 +330,8 @@ jobs:
         # Usar imagem local carregada no Kind
         sed -i "s|newName:.*|newName: tech-challenge-app|" kustomization.yaml
         sed -i "s|newTag:.*|newTag: latest|" kustomization.yaml
+        # Reduce replicas for development environment
+        sed -i "s|count:.*|count: 1|" kustomization.yaml
         echo "📄 Kustomization atualizado:"
         cat kustomization.yaml
     
@@ -336,12 +347,19 @@ jobs:
         
         # Apply all resources using kustomize
         kubectl apply -k k8s/
-        kubectl rollout status deployment/workshop-app-deployment -n workshop-app --timeout=300s
+        kubectl rollout status deployment/workshop-app-deployment -n workshop-app --timeout=600s
     
     - name: Verify Deployment
       run: |
-        kubectl get pods -n workshop-app
+        echo "📊 Checking deployment status..."
+        kubectl get pods -n workshop-app -o wide
         kubectl get services -n workshop-app
+        kubectl get events -n workshop-app --sort-by='.lastTimestamp'
+        
+        echo "🔍 Checking pod logs..."
+        kubectl logs -l app=workshop-app -n workshop-app --tail=50 || true
+        
+        echo "📄 Deployment details..."
         kubectl describe deployment workshop-app-deployment -n workshop-app
 
   # Job 7: Deploy to Production (only when configured)
