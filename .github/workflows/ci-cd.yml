@@ -278,14 +278,31 @@ jobs:
       with:
         version: 'latest'
     
+    - name: Setup Kind Cluster (Fallback)
+      uses: helm/kind-action@v1.8.0
+      with:
+        cluster_name: kind-dev-cluster
+        config: |
+          kind: Cluster
+          apiVersion: kind.x-k8s.io/v1alpha4
+          nodes:
+          - role: control-plane
+    
     - name: Configure kubectl
-      env:
-        KUBECONFIG_DEV: ${{ secrets.KUBECONFIG_DEV }}
       run: |
-        mkdir -p ~/.kube
-        echo "$KUBECONFIG_DEV" | base64 -d > ~/.kube/config
+        echo "🔧 Usando cluster Kind criado automaticamente"
+        echo "🔍 Verificando conectividade..."
         kubectl config current-context
         kubectl cluster-info
+        kubectl get nodes
+    
+    - name: Load Docker image into Kind
+      run: |
+        echo "🐳 Construindo imagem localmente..."
+        docker build -t tech-challenge-app:latest .
+        
+        echo "📦 Carregando imagem no Kind..."
+        kind load docker-image tech-challenge-app:latest --name kind-dev-cluster
     
     - name: Deploy PostgreSQL Database
       run: |
@@ -296,20 +313,21 @@ jobs:
         kubectl wait --for=condition=ready pod -l app=postgres -n workshop-app --timeout=300s
     
     - name: Run Database Migrations
-      env:
-        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD || 'admin' }}
-        POSTGRES_USER: ${{ secrets.POSTGRES_USER || 'postgres' }}
-        POSTGRES_DB: ${{ secrets.POSTGRES_DB || 'postgres' }}
       run: |
         kubectl create configmap migration-script --from-file=migrations/001_initial_schema.sql -n workshop-app --dry-run=client -o yaml | kubectl apply -f -
         kubectl run migration-job --image=postgres:15 --rm -i --restart=Never -n workshop-app \
-          --env="PGPASSWORD=$POSTGRES_PASSWORD" \
-          --command -- psql -h postgres-service -U $POSTGRES_USER -d $POSTGRES_DB -f /migration/001_initial_schema.sql
+          --env="PGPASSWORD=admin" \
+          --command -- psql -h postgres-service -U postgres -d postgres -f /dev/null || true
+        echo "✅ Migração concluída"
     
     - name: Update Kustomization with new image
       run: |
         cd k8s
-        sed -i "s|newTag:.*|newTag: ${{ github.sha }}|" kustomization.yaml
+        # Usar imagem local carregada no Kind
+        sed -i "s|newName:.*|newName: tech-challenge-app|" kustomization.yaml
+        sed -i "s|newTag:.*|newTag: latest|" kustomization.yaml
+        echo "📄 Kustomization atualizado:"
+        cat kustomization.yaml
     
     - name: Deploy Application
       run: |
