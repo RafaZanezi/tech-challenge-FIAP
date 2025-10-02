@@ -1,0 +1,75 @@
+name: Database Migration
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to run migration'
+        required: true
+        default: 'development'
+        type: choice
+        options:
+        - development
+        - production
+      migration_file:
+        description: 'Migration file to run (optional, defaults to all)'
+        required: false
+        type: string
+      rollback:
+        description: 'Rollback last migration'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+    
+    - name: Configure kubectl
+      run: |
+        mkdir -p ~/.kube
+        if [ "${{ github.event.inputs.environment }}" == "production" ]; then
+          echo "${{ secrets.KUBECONFIG_PROD }}" | base64 -d > ~/.kube/config
+        else
+          echo "${{ secrets.KUBECONFIG_DEV }}" | base64 -d > ~/.kube/config
+        fi
+    
+    - name: Backup Database (Production only)
+      if: github.event.inputs.environment == 'production'
+      run: |
+        kubectl exec -n workshop-app deployment/postgres-deployment -- pg_dump -U ${{ secrets.POSTGRES_USER_PROD }} ${{ secrets.POSTGRES_DB_PROD }} > backup-$(date +%Y%m%d-%H%M%S).sql
+        # Upload backup to storage (implementar conforme necessário)
+    
+    - name: Create Migration ConfigMap
+      run: |
+        if [ -n "${{ github.event.inputs.migration_file }}" ]; then
+          kubectl create configmap migration-script --from-file=migrations/${{ github.event.inputs.migration_file }} -n workshop-app --dry-run=client -o yaml | kubectl apply -f -
+        else
+          kubectl create configmap migration-script --from-file=migrations/ -n workshop-app --dry-run=client -o yaml | kubectl apply -f -
+        fi
+    
+    - name: Run Migration
+      if: github.event.inputs.rollback == 'false'
+      run: |
+        kubectl run migration-job-$(date +%s) --image=postgres:15 --rm -i --restart=Never -n workshop-app \
+          --env="PGPASSWORD=${{ secrets.POSTGRES_PASSWORD }}" \
+          --command -- bash -c "
+            for file in /migration/*.sql; do
+              echo \"Running migration: \$file\"
+              psql -h postgres-service -U ${{ secrets.POSTGRES_USER }} -d ${{ secrets.POSTGRES_DB }} -f \$file
+            done
+          "
+    
+    - name: Verify Migration
+      run: |
+        kubectl run verify-job-$(date +%s) --image=postgres:15 --rm -i --restart=Never -n workshop-app \
+          --env="PGPASSWORD=${{ secrets.POSTGRES_PASSWORD }}" \
+          --command -- psql -h postgres-service -U ${{ secrets.POSTGRES_USER }} -d ${{ secrets.POSTGRES_DB }} -c "\dt"

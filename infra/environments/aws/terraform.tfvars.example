@@ -1,0 +1,42 @@
+# AWS Environment Configuration File
+# Copy this file to terraform.tfvars and adjust the values as needed
+
+# General Configuration
+region      = "us-west-2"
+environment = "dev"
+owner       = "tech-challenge-team"
+
+# Cluster Configuration
+cluster_name    = "workshop-eks-cluster"
+cluster_version = "1.27"
+
+# Networking Configuration
+vpc_cidr                = "10.0.0.0/16"
+private_subnet_cidrs    = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+public_subnet_cidrs     = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+database_subnet_cidrs   = ["10.0.201.0/24", "10.0.202.0/24", "10.0.203.0/24"]
+
+# EKS Node Group Configuration
+node_group_name     = "main"
+node_instance_types = ["t3.medium"]
+node_capacity_type  = "ON_DEMAND"  # or "SPOT" for cost savings
+node_disk_size      = 20
+node_desired_size   = 2
+node_max_size       = 4
+node_min_size       = 1
+
+# Database Configuration
+db_name                   = "workshop_db"
+db_username               = "postgres"
+db_password               = "ChangeThisToASecurePassword123!"  # CHANGE THIS!
+db_port                   = 5432
+db_instance_class         = "db.t3.micro"  # Change to db.t3.small or larger for production
+db_allocated_storage      = 20
+db_max_allocated_storage  = 100
+db_engine_version         = "15.4"
+backup_retention_period   = 7
+multi_az                  = false  # Set to true for production
+publicly_accessible       = false
+storage_encrypted         = true
+deletion_protection       = false  # Set to true for production
+skip_final_snapshot       = true   # Set to false for production

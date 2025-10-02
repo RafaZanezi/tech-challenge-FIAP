@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: workshop-app-deployment
+  namespace: workshop-app
+  labels:
+    app: workshop-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: workshop-app
+  template:
+    metadata:
+      labels:
+        app: workshop-app
+    spec:
+      containers:
+      - name: workshop-app
+        image: workshop-app:latest
+        ports:
+        - containerPort: 3000
+          name: http
+        env:
+        # Environment variables from ConfigMap
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: workshop-app-config
+              key: NODE_ENV
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: workshop-app-config
+              key: PORT
+        - name: APP_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: workshop-app-config
+              key: APP_NAME
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: workshop-app-config
+              key: LOG_LEVEL
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: workshop-app-config
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: workshop-app-config
+              key: DB_PORT
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: workshop-app-config
+              key: DB_NAME
+        
+        # Sensitive environment variables from Secret
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: workshop-app-secrets
+              key: DATABASE_URL
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: workshop-app-secrets
+              key: JWT_SECRET
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: workshop-app-secrets
+              key: DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: workshop-app-secrets
+              key: DB_PASSWORD
+        - name: EXTERNAL_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: workshop-app-secrets
+              key: EXTERNAL_API_TOKEN
+              
+        # Resource limits and requests for HPA
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+            
+        # Health checks
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+          
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+          
+        # Security context
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          readOnlyRootFilesystem: false
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+            
+      # Image pull policy
+      imagePullPolicy: Always
+      
+      # Restart policy
+      restartPolicy: Always

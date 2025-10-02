@@ -2,19 +2,83 @@
 
 Sistema desenvolvido durante o curso de pós-graduação em **Arquitetura de Software pela FIAP** (Fase 2) para gerenciamento completo de ordens de serviço automotivo, seguindo os princípios de **Clean Architecture**.
 
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-brightgreen)](./.github/workflows/ci-cd.yml)
 [![Coverage](https://img.shields.io/badge/Coverage-95%25-brightgreen)](./coverage)
 [![Tests](https://img.shields.io/badge/Tests-68/68_passing-brightgreen)](#testes)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-20%2B-green)](https://nodejs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-Enabled-blue)](./Dockerfile)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-Ready-326CE5)](./k8s/)
 
 ## 🚀 Como Executar
+
+### 🔄 Pipeline CI/CD (GitHub Actions)
+
+**NOVO**: Pipeline completo de CI/CD configurado com GitHub Actions!
+
+- **⚡ [Setup Rápido do Pipeline](./.github/PIPELINE_SETUP.md)** - Configure em 5 minutos
+- **📖 [Documentação Completa](./.github/PIPELINE_DOCS.md)** - Guia detalhado do pipeline
+- **🔧 [Verificação Local](./scripts/verify-pipeline.sh)** - Teste antes do push
+
+```bash
+# Testar pipeline localmente antes do push
+./scripts/verify-pipeline.sh
+
+# Deploy automático para desenvolvimento
+git push origin develop
+
+# Deploy para produção (requer aprovação)
+git push origin main
+```
+
+**Pipeline inclui:**
+- ✅ Build da aplicação
+- ✅ Testes automatizados (unitários + integração)
+- ✅ Build da imagem Docker
+- ✅ Scan de segurança (Trivy)
+- ✅ Deploy no Kubernetes
+- ✅ Deploy do banco de dados
+- ✅ Aplicação de manifestos YAML
+- ✅ Health checks e rollback automático
+
+### 🏗️ Infraestrutura como Código (Terraform)
+
+**NOVIDADE**: O projeto agora inclui infraestrutura completa com Terraform para provisionamento automatizado!
+
+- **🚀 [Documentação Terraform Completa](./terraform/README.md)** - Guia completo de infraestrutura
+- **📖 [Exemplos de Uso](./terraform/EXAMPLES.md)** - Cenários práticos e casos de uso
+- **🔧 [Documentação dos Módulos](./terraform/MODULES.md)** - Detalhes técnicos dos módulos
+
+```bash
+# Deploy completo com Terraform (ambiente local)
+cd terraform
+make dev-setup
+
+# Deploy completo na AWS
+make aws-deploy
+make aws-app
+```
+
+### 📦 Deploy em Kubernetes (Produção)
+
+Para deploy em ambiente de produção Kubernetes, consulte nossa documentação completa:
+
+- **📋 [Guia Completo de Deploy Kubernetes](./KUBERNETES_DEPLOY_GUIDE.md)** - Documentação detalhada com todos os manifestos
+- **⚡ [Quick Deploy Guide](./QUICK_DEPLOY.md)** - Checklist rápido para deploy em 5 minutos
+
+```bash
+# Deploy rápido em Kubernetes
+cd k8s
+./deploy.sh
+```
 
 ### Pré-requisitos
 - **Node.js** (versão 18 ou superior)
 - **PostgreSQL** (versão 12 ou superior)
 - **npm** ou **yarn**
 - **Docker** (opcional - para execução com containers)
+- **Kubernetes** (opcional - para deploy em produção)
 
 ### 🐳 Execução com Docker (Recomendado)
 

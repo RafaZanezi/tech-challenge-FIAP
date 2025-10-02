@@ -1,0 +1,11 @@
+# Local Environment Configuration File
+# Copy this file to terraform.tfvars and adjust the values as needed
+
+# Database Configuration
+db_name     = "workshop_db"
+db_username = "postgres"
+db_password = "admin123"  # Change this to a secure password
+db_port     = 5432
+
+# Cluster Configuration
+cluster_version = "1.27.3"

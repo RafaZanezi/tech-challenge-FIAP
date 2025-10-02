@@ -1,0 +1,79 @@
+name: Hotfix Deploy
+
+on:
+  push:
+    branches: [ hotfix/* ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - development
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Job de emergência para hotfixes
+  emergency-deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run critical tests only
+      run: npm test -- --testPathPattern=".(test|spec).ts$" --testNamePattern="critical"
+    
+    - name: Build Docker image
+      run: |
+        docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:hotfix-${{ github.sha }} .
+    
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Push hotfix image
+      run: |
+        docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:hotfix-${{ github.sha }}
+    
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+    
+    - name: Configure kubectl
+      run: |
+        mkdir -p ~/.kube
+        if [ "${{ github.event.inputs.environment || 'production' }}" == "production" ]; then
+          echo "${{ secrets.KUBECONFIG_PROD }}" | base64 -d > ~/.kube/config
+        else
+          echo "${{ secrets.KUBECONFIG_DEV }}" | base64 -d > ~/.kube/config
+        fi
+    
+    - name: Deploy hotfix
+      run: |
+        kubectl set image deployment/workshop-app-deployment workshop-app=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:hotfix-${{ github.sha }} -n workshop-app
+        kubectl rollout status deployment/workshop-app-deployment -n workshop-app --timeout=300s
+    
+    - name: Verify hotfix deployment
+      run: |
+        kubectl get pods -n workshop-app
+        # Teste básico de saúde
+        kubectl exec -n workshop-app deployment/workshop-app-deployment -- curl -f http://localhost:3000/health || echo "Health check failed"
