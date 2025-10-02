@@ -23,6 +23,7 @@ commonLabels:
 
 images:
   - name: workshop-app
+    newName: tech-challenge-app
     newTag: latest
 
 replicas:

@@ -37,29 +37,26 @@ jobs:
       uses: helm/kind-action@v1.8.0
       with:
         cluster_name: kind-dev-cluster
-        config: |
-          kind: Cluster
-          apiVersion: kind.x-k8s.io/v1alpha4
-          nodes:
-          - role: control-plane
-            kubeadmConfigPatches:
-            - |
-              kind: InitConfiguration
-              nodeRegistration:
-                kubeletExtraArgs:
-                  node-labels: "ingress-ready=true"
-            extraPortMappings:
-            - containerPort: 80
-              hostPort: 80
-              protocol: TCP
-            - containerPort: 443
-              hostPort: 443
-              protocol: TCP
     
     - name: Wait for cluster to be ready
       run: |
         echo "🔄 Aguardando cluster ficar pronto..."
-        kubectl wait --for=condition=Ready nodes --all --timeout=300s
+        
+        # Aguardar o cluster ficar disponível
+        timeout=300
+        count=0
+        while [ $count -lt $timeout ]; do
+          if kubectl cluster-info > /dev/null 2>&1; then
+            echo "✅ Cluster está respondendo!"
+            break
+          fi
+          echo "⏳ Aguardando cluster... ($count/$timeout)"
+          sleep 5
+          count=$((count + 5))
+        done
+        
+        # Verificar nodes
+        kubectl wait --for=condition=Ready nodes --all --timeout=60s
         kubectl cluster-info
         kubectl get nodes
     
