@@ -171,13 +171,11 @@ describe('VehicleGateway', () => {
             const result = await vehicleGateway.insert(vehicle);
 
             expect(mockPostgresConnection.insert).toHaveBeenCalledWith('vehicles', {
-                props: {
-                    brand: 'Toyota',
-                    model: 'Corolla',
-                    year: 2020,
-                    license_plate: 'ABC-1234',
-                    client_id: 1
-                }
+                brand: 'Toyota',
+                model: 'Corolla',
+                year: 2020,
+                license_plate: 'ABC-1234',
+                client_id: 1
             });
 
             expect(result).toEqual({

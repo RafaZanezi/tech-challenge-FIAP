@@ -221,11 +221,13 @@ describe('ServiceOrderGateway', () => {
             const result = await serviceOrderGateway.create(serviceOrder);
 
             expect(mockPostgresConnection.insert).toHaveBeenCalledWith('service_orders', expect.objectContaining({
-                props: expect.objectContaining({
-                    clientId: 1,
-                    vehicleId: 1,
-                    status: ServiceOrderStatus.RECEIVED
-                })
+                clientId: 1,
+                vehicleId: 1,
+                status: ServiceOrderStatus.RECEIVED,
+                services: expect.any(String),
+                supplies: expect.any(String),
+                createdAt: expect.any(Date),
+                finalizedAt: null
             }));
             expect(result.id).toBe(1);
             expect(result.clientId).toBe(1);
