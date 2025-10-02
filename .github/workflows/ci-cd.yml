@@ -6,9 +6,14 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+permissions:
+  contents: read
+  packages: write
+  security-events: write
+
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: ${{ github.repository_owner }}/tech-challenge-fiap
   POSTGRES_HOST: localhost
   POSTGRES_PORT: 5432
   POSTGRES_DB: postgres
@@ -85,6 +90,10 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     
+    permissions:
+      contents: read
+      packages: write
+      
     outputs:
       image-digest: ${{ steps.build.outputs.digest }}
       image-tag: ${{ steps.meta.outputs.tags }}
@@ -100,7 +109,7 @@ jobs:
       uses: docker/login-action@v3
       with:
         registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
+        username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Extract metadata
