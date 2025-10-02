@@ -100,9 +100,9 @@ setup_test_db() {
     # Iniciar PostgreSQL container
     docker run -d \
         --name test-postgres \
-        -e POSTGRES_USER=test_user \
-        -e POSTGRES_PASSWORD=test_password \
-        -e POSTGRES_DB=test_db \
+        -e POSTGRES_USER=postgres \
+        -e POSTGRES_PASSWORD=admin \
+        -e POSTGRES_DB=postgres \
         -p 5433:5432 \
         postgres:15
     
@@ -111,7 +111,7 @@ setup_test_db() {
     sleep 10
     
     # Executar migrações
-    PGPASSWORD=test_password psql -h localhost -p 5433 -U test_user -d test_db -f migrations/001_initial_schema.sql
+    PGPASSWORD=admin psql -h localhost -p 5433 -U postgres -d postgres -f migrations/001_initial_schema.sql
     
     log_info "Banco de dados configurado"
 }
@@ -119,9 +119,9 @@ setup_test_db() {
 # Executar testes de integração
 run_integration_tests() {
     log_info "Executando testes de integração..."
-    
-    export DATABASE_URL="postgresql://test_user:test_password@localhost:5433/test_db"
-    
+
+    export DATABASE_URL="postgresql://postgres:admin@localhost:5433/postgres"
+
     if npm run test:integration; then
         log_info "Testes de integração passaram"
     else
@@ -154,7 +154,7 @@ test_docker() {
     docker run -d \
         --name test-app \
         --link test-postgres:postgres \
-        -e DATABASE_URL="postgresql://test_user:test_password@postgres:5432/test_db" \
+        -e DATABASE_URL="postgresql://postgres:admin@postgres:5432/postgres" \
         -p 3001:3000 \
         tech-challenge-fiap:local
     

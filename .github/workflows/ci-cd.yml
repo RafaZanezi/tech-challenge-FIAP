@@ -15,7 +15,6 @@ env:
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: admin
   DATABASE_URL: postgresql://postgres:admin@localhost:5432/postgres
-  # DATABASE_URL: postgres://postgres:admin@localhost:5432/postgres
 
 jobs:
   # Job 1: Build e Test
@@ -26,9 +25,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: test_db
-          POSTGRES_USER: test_user
-          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: admin
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -57,8 +56,10 @@ jobs:
       run: |
         PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U $POSTGRES_USER -d $POSTGRES_DB -f migrations/001_initial_schema.sql
       env:
-        PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
-    
+        PGPASSWORD: admin
+        POSTGRES_USER: postgres
+        POSTGRES_DB: postgres
+
     - name: Build application
       run: npm run build
     
